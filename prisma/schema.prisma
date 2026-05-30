@@ -1,0 +1,132 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── USER ────────────────────────────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  phone     String?
+  password  String
+  role      Role     @default(CUSTOMER)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cart Cart?
+
+  @@map("users")
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+// ─── CATEGORY ────────────────────────────────────────────────────────────────
+
+model Category {
+  id       String     @id @default(cuid())
+  name     String
+  slug     String     @unique
+  parentId String?
+  isActive Boolean    @default(true)
+
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryTree")
+  products Product[]
+
+  @@map("categories")
+}
+
+// ─── PRODUCT ─────────────────────────────────────────────────────────────────
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  categoryId  String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  category Category?      @relation(fields: [categoryId], references: [id])
+  variants Variant[]
+  images   ProductImage[]
+
+  @@map("products")
+}
+
+// ─── VARIANT ─────────────────────────────────────────────────────────────────
+
+model Variant {
+  id         String   @id @default(cuid())
+  productId  String
+  sku        String   @unique
+  price      Decimal  @db.Decimal(10, 2)
+  stock      Int      @default(0)
+  attributes Json
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  product   Product        @relation(fields: [productId], references: [id])
+  images    ProductImage[]
+  cartItems CartItem[]
+
+  @@map("variants")
+}
+
+// ─── PRODUCT IMAGE ───────────────────────────────────────────────────────────
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  productId String
+  variantId String?
+  url       String
+  order     Int     @default(0)
+  isMain    Boolean @default(false)
+
+  product Product  @relation(fields: [productId], references: [id])
+  variant Variant? @relation(fields: [variantId], references: [id])
+
+  @@map("product_images")
+}
+
+// ─── CART ────────────────────────────────────────────────────────────────────
+
+model Cart {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User       @relation(fields: [userId], references: [id])
+  items CartItem[]
+
+  @@map("carts")
+}
+
+model CartItem {
+  id        String @id @default(cuid())
+  cartId    String
+  variantId String
+  quantity  Int    @default(1)
+
+  cart    Cart    @relation(fields: [cartId], references: [id])
+  variant Variant @relation(fields: [variantId], references: [id])
+
+  @@unique([cartId, variantId])
+  @@map("cart_items")
+}
