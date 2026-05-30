@@ -13,7 +13,8 @@ COPY . .
 RUN pnpm dlx prisma generate
 RUN pnpm run build api
 
-FROM base AS runner
+FROM node:20-alpine AS runner
+RUN npm install -g pnpm
 WORKDIR /app
 ENV NODE_ENV=production
 
@@ -22,6 +23,7 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/generated ./generated
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 
 EXPOSE 3000
 
