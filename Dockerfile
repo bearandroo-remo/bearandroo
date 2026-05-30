@@ -25,6 +25,6 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 
-EXPOSE 3000
+EXPOSE 8080
 
 CMD ["node", "dist/apps/api/main.js"]
