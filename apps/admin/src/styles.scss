@@ -1,2 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
 @use "primeicons/primeicons.css";
+
+.p-image-preview-mask {
+  .p-image-preview-indicator {
+    top: 1rem !important;
+    right: 1rem !important;
+  }
+}

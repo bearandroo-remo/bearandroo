@@ -7,6 +7,7 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  Put,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageService } from './image.service';
@@ -36,5 +37,10 @@ export class ImageController {
   @Delete(':id')
   delete(@Param('id') id: string) {
     return this.imageService.deleteImage(id);
+  }
+
+  @Put(':id/main')
+  setMain(@Param('id') id: string) {
+    return this.imageService.setMain(id);
   }
 }

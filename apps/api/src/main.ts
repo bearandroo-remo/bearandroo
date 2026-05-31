@@ -6,7 +6,11 @@ async function bootstrap() {
   const app = await NestFactory.create(ApiModule);
 
   app.enableCors({
-    origin: ['http://localhost:4200', 'https://admin.bearandroo.com.tr'],
+    origin: [
+      'http://localhost:4200',
+      'https://admin.bearandroo.com.tr',
+      'https://cold-sea-5b2a.yunusoncel.workers.dev',
+    ],
     credentials: true,
   });
 

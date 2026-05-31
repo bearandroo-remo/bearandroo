@@ -76,4 +76,21 @@ export class ImageService {
 
     return this.prisma.productImage.delete({ where: { id } });
   }
+
+  async setMain(id: string) {
+    const image = await this.prisma.productImage.findUnique({ where: { id } });
+    if (!image) throw new BadRequestException('Image not found');
+
+    // Önce tüm resimlerin isMain'ini false yap
+    await this.prisma.productImage.updateMany({
+      where: { productId: image.productId },
+      data: { isMain: false },
+    });
+
+    // Sonra seçileni true yap
+    return this.prisma.productImage.update({
+      where: { id },
+      data: { isMain: true },
+    });
+  }
 }
