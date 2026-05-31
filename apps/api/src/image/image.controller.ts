@@ -43,4 +43,5 @@ export class ImageController {
   setMain(@Param('id') id: string) {
     return this.imageService.setMain(id);
   }
+
 }
