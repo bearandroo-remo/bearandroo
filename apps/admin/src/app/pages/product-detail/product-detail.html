@@ -1,0 +1,82 @@
+<div class="page">
+  <div class="page-header">
+    <p-button icon="pi pi-arrow-left" severity="secondary" [text]="true" (onClick)="goBack()" />
+    <h1>{{ product()?.name }}</h1>
+  </div>
+
+  <div class="detail-grid">
+    <!-- Varyantlar -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Varyantlar</h2>
+        <p-button label="Yeni Varyant" icon="pi pi-plus" size="small" (onClick)="openVariantDialog()" />
+      </div>
+      <p-table [value]="variants()" [loading]="loading()">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>SKU</th>
+            <th>Fiyat</th>
+            <th>Stok</th>
+            <th>Attributes</th>
+            <th>İşlem</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-variant>
+          <tr>
+            <td>{{ variant.sku }}</td>
+            <td>{{ variant.price }} ₺</td>
+            <td>{{ variant.stock }}</td>
+            <td>{{ formatAttributes(variant.attributes) }}</td>
+            <td>
+              <p-button icon="pi pi-pencil" severity="secondary" [text]="true" (onClick)="openVariantDialog(variant)" />
+              <p-button icon="pi pi-trash" severity="danger" [text]="true" (onClick)="deleteVariant(variant.id)" />
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <!-- Resimler -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Resimler</h2>
+        <p-button label="Resim Yükle" icon="pi pi-upload" size="small" (onClick)="fileInput.click()" />
+        <input #fileInput type="file" accept="image/*" style="display:none" (change)="uploadImage($event)" />
+      </div>
+      <div class="images-grid">
+        <div *ngFor="let image of images()" class="image-item">
+          <img [src]="image.url" />
+          <div class="image-actions">
+            <p-button icon="pi pi-trash" severity="danger" size="small" (onClick)="deleteImage(image.id)" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Varyant Dialog -->
+<p-dialog [(visible)]="variantDialogVisible" [header]="editingVariantId() ? 'Varyant Düzenle' : 'Yeni Varyant'"
+          [modal]="true" [style]="{width: '500px'}">
+  <div class="field">
+    <label>SKU</label>
+    <input pInputText [(ngModel)]="variantForm.sku" class="w-full" />
+  </div>
+  <div class="field">
+    <label>Fiyat</label>
+    <p-inputnumber [(ngModel)]="variantForm.price" mode="decimal" [minFractionDigits]="2" class="w-full" />
+  </div>
+  <div class="field">
+    <label>Stok</label>
+    <p-inputnumber [(ngModel)]="variantForm.stock" [useGrouping]="false" class="w-full" />
+  </div>
+  <div class="field">
+    <label>Attributes (JSON)</label>
+    <textarea pTextarea [(ngModel)]="variantForm.attributesJson" rows="3" class="w-full"
+              placeholder='{"size":"M","color":"Kırmızı"}'></textarea>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button label="İptal" severity="secondary" (onClick)="variantDialogVisible = false" />
+    <p-button label="Kaydet" (onClick)="saveVariant()" [loading]="saving()" />
+  </ng-template>
+</p-dialog>

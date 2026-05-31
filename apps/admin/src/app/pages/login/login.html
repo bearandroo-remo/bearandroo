@@ -1,0 +1,20 @@
+<div class="login-wrapper">
+  <div class="login-card">
+    <h2>Bearandroo Admin</h2>
+    <form (ngSubmit)="onLogin()">
+      <div class="field">
+        <p-floatlabel>
+          <input pInputText id="email" [(ngModel)]="email" name="email" type="email" />
+          <label for="email">Email</label>
+        </p-floatlabel>
+      </div>
+      <div class="field">
+        <p-floatlabel>
+          <p-password id="password" [(ngModel)]="password" name="password" [feedback]="false" />
+          <label for="password">Şifre</label>
+        </p-floatlabel>
+      </div>
+      <p-button label="Giriş Yap" type="submit" [loading]="loading" styleClass="w-full" />
+    </form>
+  </div>
+</div>

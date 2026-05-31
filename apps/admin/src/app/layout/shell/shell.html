@@ -1,0 +1,37 @@
+<div class="shell">
+  <header class="topbar">
+    <p-button icon="pi pi-bars" severity="secondary" [text]="true" (onClick)="toggleMenu()" />
+    <h3>Bearandroo Admin</h3>
+  </header>
+
+  <div class="body">
+    <aside class="sidebar" [class.open]="menuOpen()">
+      <nav>
+        <ul>
+          <li>
+            <a routerLink="/dashboard" routerLinkActive="active" (click)="menuOpen.set(false)">
+              <i class="pi pi-home"></i> Dashboard
+            </a>
+          </li>
+          <li>
+            <a routerLink="/products" routerLinkActive="active" (click)="menuOpen.set(false)">
+              <i class="pi pi-box"></i> Ürünler
+            </a>
+          </li>
+          <li>
+            <a routerLink="/categories" routerLinkActive="active" (click)="menuOpen.set(false)">
+              <i class="pi pi-tags"></i> Kategoriler
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <div class="logout">
+        <p-button label="Çıkış" icon="pi pi-sign-out" severity="secondary" (onClick)="logout()" />
+      </div>
+    </aside>
+
+    <main class="content">
+      <router-outlet />
+    </main>
+  </div>
+</div>
