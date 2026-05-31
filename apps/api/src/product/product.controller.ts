@@ -9,8 +9,12 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ProductService } from './product.service';
-import type { CreateProductDto, UpdateProductDto } from './product.service';
+import {
+  ProductService,
+  CreateProductDto,
+  UpdateProductDto,
+} from './product.service';
+
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -27,6 +31,11 @@ export class ProductController {
   @Get(':slug')
   findBySlug(@Param('slug') slug: string) {
     return this.productService.findBySlug(slug);
+  }
+
+  @Get('id/:id')
+  findById(@Param('id') id: string) {
+    return this.productService.findById(id);
   }
 
   @Post()

@@ -5,6 +5,11 @@ import { ApiModule } from './api.module';
 async function bootstrap() {
   const app = await NestFactory.create(ApiModule);
 
+  app.enableCors({
+    origin: ['http://localhost:4200', 'https://admin.bearandroo.com.tr'],
+    credentials: true,
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

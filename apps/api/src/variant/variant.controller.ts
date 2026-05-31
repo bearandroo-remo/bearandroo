@@ -8,8 +8,11 @@ import {
   Param,
   UseGuards,
 } from '@nestjs/common';
-import { VariantService } from './variant.service';
-import type { CreateVariantDto, UpdateVariantDto } from './variant.service';
+import {
+  VariantService,
+  CreateVariantDto,
+  UpdateVariantDto,
+} from './variant.service';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
