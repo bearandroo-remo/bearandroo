@@ -1,6 +1,6 @@
 import { Component, signal, OnInit, computed } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, JsonPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -12,6 +12,7 @@ import { HttpService } from '../../http.service';
 import { SelectModule } from 'primeng/select';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ImageModule } from 'primeng/image';
+import { TabsModule } from 'primeng/tabs';
 
 
 interface Variant {
@@ -25,6 +26,8 @@ interface Variant {
 interface ProductImage {
   id: string;
   url: string;
+  thumbUrl: string | null;
+  ogUrl: string | null;
   isMain: boolean;
   variantId: string | null;
 }
@@ -50,6 +53,8 @@ interface Product {
     SelectModule,
     CheckboxModule,
     ImageModule,
+    TabsModule,
+    JsonPipe,
   ],
   templateUrl: './product-detail.html',
   styleUrl: './product-detail.scss',
@@ -69,8 +74,24 @@ export class ProductDetailComponent implements OnInit {
   uploading = signal(false);
   selectedFile: File | null = null;
   imageForm = { variantId: null as string | null, isMain: false };
+  activeTab: string | number = '0';
+  schemaOrg = signal<unknown>(null);
 
   private productId = '';
+
+  seoSaving = signal(false);
+  seoForm = {
+    metaTitle: '',
+    metaDescription: '',
+    canonicalUrl: '',
+    noIndex: false,
+    ogTitle: '',
+    ogDescription: '',
+    ogImage: '',
+    twitterTitle: '',
+    twitterDescription: '',
+    twitterImage: '',
+  };
 
   constructor(
     private route: ActivatedRoute,
@@ -90,9 +111,49 @@ export class ProductDetailComponent implements OnInit {
     })),
   );
 
+  ogImageOptions = computed(() =>
+    this.images()
+      .filter((i) => i.ogUrl)
+      .map((i) => ({ label: i.ogUrl!, value: i.ogUrl! })),
+  );
+
   async ngOnInit() {
     this.productId = this.route.snapshot.paramMap.get('id') ?? '';
     await this.load();
+    await this.loadSeo();
+  }
+
+  async loadSeo() {
+    try {
+      const seo = await this.http.get<typeof this.seoForm | null>(`/seo/product/${this.productId}`);
+      if (seo) {
+        this.seoForm = {
+          metaTitle: seo.metaTitle ?? '',
+          metaDescription: seo.metaDescription ?? '',
+          canonicalUrl:
+            seo.canonicalUrl ?? `https://bearandroo.com.tr/urun/${this.product()?.slug ?? ''}`,
+          noIndex: seo.noIndex ?? false,
+          ogTitle: seo.ogTitle ?? '',
+          ogDescription: seo.ogDescription ?? '',
+          ogImage: seo.ogImage ?? '',
+          twitterTitle: seo.twitterTitle ?? '',
+          twitterDescription: seo.twitterDescription ?? '',
+          twitterImage: seo.twitterImage ?? '',
+        };
+      } else {
+        this.seoForm.canonicalUrl = `https://bearandroo.com.tr/urun/${this.product()?.slug ?? ''}`;
+      }
+    } catch {
+      this.seoForm.canonicalUrl = `https://bearandroo.com.tr/urun/${this.product()?.slug ?? ''}`;
+    }
+    const schema = await this.http.get<unknown>(`/seo/product/${this.productId}/schema`);
+    this.schemaOrg.set(schema);
+  }
+
+  async saveSeo() {
+    this.seoSaving.set(true);
+    await this.http.put(`/seo/product/${this.productId}`, this.seoForm);
+    this.seoSaving.set(false);
   }
 
   async load() {

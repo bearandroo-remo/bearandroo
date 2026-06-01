@@ -1,10 +1,12 @@
 FROM node:20-alpine AS base
 RUN npm install -g pnpm
+RUN apk add --no-cache vips-dev
 
 FROM base AS deps
 WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
+RUN pnpm rebuild sharp
 
 FROM base AS builder
 WORKDIR /app
@@ -14,6 +16,7 @@ RUN pnpm dlx prisma generate
 RUN pnpm run build api
 
 FROM node:20-alpine AS runner
+RUN apk add --no-cache vips
 RUN npm install -g pnpm
 WORKDIR /app
 ENV NODE_ENV=production

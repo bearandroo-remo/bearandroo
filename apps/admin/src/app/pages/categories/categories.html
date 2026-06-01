@@ -32,21 +32,79 @@
   </p-table>
 </div>
 
-<p-dialog [(visible)]="dialogVisible" [header]="editingId() ? 'Kategori Düzenle' : 'Yeni Kategori'" [modal]="true" [style]="{width: '400px'}">
-  <div class="field">
-    <label>Ad</label>
-    <input pInputText [(ngModel)]="form.name" (ngModelChange)="autoSlug($event)" class="w-full" />
-  </div>
-  <div class="field">
-    <label>Slug</label>
-    <input pInputText [(ngModel)]="form.slug" class="w-full" />
-  </div>
-  <div class="field">
-    <label>Üst Kategori</label>
-    <p-select [options]="categories()" optionLabel="name" optionValue="id"
-              [(ngModel)]="form.parentId" placeholder="Seç" [showClear]="true"
-              appendTo="body" class="w-full" />
-  </div>
+<p-dialog [(visible)]="dialogVisible" [header]="editingId() ? 'Kategori Düzenle' : 'Yeni Kategori'" [modal]="true" [style]="{width: '500px'}">
+  <p-tabs [value]="categoryActiveTab" (valueChange)="categoryActiveTab = $any($event)">
+    <p-tablist>
+      <p-tab value="0">Genel</p-tab>
+      <p-tab value="1" [disabled]="!editingId()">SEO</p-tab>
+    </p-tablist>
+    <p-tabpanels>
+      <!-- Genel -->
+      <p-tabpanel value="0">
+        <div class="field">
+          <label>Ad</label>
+          <input pInputText [(ngModel)]="form.name" (ngModelChange)="autoSlug($event)" class="w-full" />
+        </div>
+        <div class="field">
+          <label>Slug</label>
+          <input pInputText [(ngModel)]="form.slug" class="w-full" />
+        </div>
+        <div class="field">
+          <label>Üst Kategori</label>
+          <p-select [options]="categories()" optionLabel="name" optionValue="id"
+                    [(ngModel)]="form.parentId" placeholder="Seç" [showClear]="true"
+                    appendTo="body" class="w-full" />
+        </div>
+      </p-tabpanel>
+
+      <!-- SEO -->
+      <p-tabpanel value="1">
+        <div class="field">
+          <label>Meta Title</label>
+          <input pInputText [(ngModel)]="seoForm.metaTitle" class="w-full" placeholder="60 karakter önerilir" />
+        </div>
+        <div class="field">
+          <label>Meta Description</label>
+          <textarea pTextarea [(ngModel)]="seoForm.metaDescription" rows="3" class="w-full" placeholder="160 karakter önerilir"></textarea>
+        </div>
+        <div class="field">
+          <label>Canonical URL</label>
+          <input pInputText [(ngModel)]="seoForm.canonicalUrl" class="w-full" />
+        </div>
+        <div class="field">
+          <label>No Index</label>
+          <p-checkbox [(ngModel)]="seoForm.noIndex" [binary]="true" />
+        </div>
+        <h3>Open Graph</h3>
+        <div class="field">
+          <label>OG Title</label>
+          <input pInputText [(ngModel)]="seoForm.ogTitle" class="w-full" />
+        </div>
+        <div class="field">
+          <label>OG Description</label>
+          <textarea pTextarea [(ngModel)]="seoForm.ogDescription" rows="2" class="w-full"></textarea>
+        </div>
+        <div class="field">
+          <label>OG Image URL</label>
+          <input pInputText [(ngModel)]="seoForm.ogImage" class="w-full" />
+        </div>
+        <h3>Twitter/X</h3>
+        <div class="field">
+          <label>Twitter Title</label>
+          <input pInputText [(ngModel)]="seoForm.twitterTitle" class="w-full" />
+        </div>
+        <div class="field">
+          <label>Twitter Description</label>
+          <textarea pTextarea [(ngModel)]="seoForm.twitterDescription" rows="2" class="w-full"></textarea>
+        </div>
+        <div class="field">
+          <label>Twitter Image URL</label>
+          <input pInputText [(ngModel)]="seoForm.twitterImage" class="w-full" />
+        </div>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+
   <ng-template pTemplate="footer">
     <p-button label="İptal" severity="secondary" (onClick)="dialogVisible = false" />
     <p-button label="Kaydet" (onClick)="save()" [loading]="saving()" />

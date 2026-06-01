@@ -36,15 +36,16 @@ enum Role {
 // ─── CATEGORY ────────────────────────────────────────────────────────────────
 
 model Category {
-  id       String     @id @default(cuid())
+  id       String  @id @default(cuid())
   name     String
-  slug     String     @unique
+  slug     String  @unique
   parentId String?
-  isActive Boolean    @default(true)
+  isActive Boolean @default(true)
 
   parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id])
   children Category[] @relation("CategoryTree")
   products Product[]
+  seo      Seo?
 
   @@map("categories")
 }
@@ -64,6 +65,7 @@ model Product {
   category Category?      @relation(fields: [categoryId], references: [id])
   variants Variant[]
   images   ProductImage[]
+  seo      Seo?
 
   @@map("products")
 }
@@ -95,6 +97,8 @@ model ProductImage {
   productId String
   variantId String?
   url       String
+  thumbUrl  String?
+  ogUrl     String?
   order     Int     @default(0)
   isMain    Boolean @default(false)
 
@@ -129,4 +133,43 @@ model CartItem {
 
   @@unique([cartId, variantId])
   @@map("cart_items")
+}
+
+// ─── SEO ─────────────────────────────────────────────────────────────────────
+
+model Seo {
+  id String @id @default(cuid())
+
+  // Temel SEO
+  metaTitle       String?
+  metaDescription String?
+  canonicalUrl    String?
+  noIndex         Boolean @default(false)
+
+  // Open Graph (Facebook, WhatsApp, Discord, Slack, Telegram, Reddit, LinkedIn)
+  ogTitle       String?
+  ogDescription String?
+  ogImage       String?
+  ogType        String? @default("product")
+
+  // Twitter/X Card
+  twitterCard        String? @default("summary_large_image")
+  twitterTitle       String?
+  twitterDescription String?
+  twitterImage       String?
+
+  // Schema.org JSON-LD (GEO - ChatGPT, Perplexity, Google AI)
+  schemaOrg Json?
+
+  // İlişkiler
+  productId  String? @unique
+  categoryId String? @unique
+
+  product  Product?  @relation(fields: [productId], references: [id])
+  category Category? @relation(fields: [categoryId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("seo")
 }

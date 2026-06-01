@@ -9,6 +9,7 @@ import { CategoryModule } from './category/category.module';
 import { ProductModule } from './product/product.module';
 import { VariantModule } from './variant/variant.module';
 import { ImageModule } from './image/image.module';
+import { SeoModule } from './seo/seo.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ImageModule } from './image/image.module';
     ProductModule,
     VariantModule,
     ImageModule,
+    SeoModule,
   ],
   controllers: [ApiController],
   providers: [ApiService, PrismaService],

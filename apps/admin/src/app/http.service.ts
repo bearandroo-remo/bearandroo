@@ -24,7 +24,9 @@ export class HttpService {
       void this.router.navigate(['/login']);
       throw new Error('Unauthorized');
     }
-    return res.json() as Promise<T>;
+    const text = await res.text();
+    if (!text) return null as T;
+    return JSON.parse(text) as T;
   }
 
   async post<T>(path: string, body: unknown): Promise<T> {

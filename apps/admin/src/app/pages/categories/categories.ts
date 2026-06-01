@@ -7,6 +7,9 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 import { HttpService } from '../../http.service';
+import { TabsModule } from 'primeng/tabs';
+import { CheckboxModule } from 'primeng/checkbox';
+import { TextareaModule } from 'primeng/textarea';
 
 interface Category {
   id: string;
@@ -27,6 +30,9 @@ interface Category {
     InputTextModule,
     SelectModule,
     TagModule,
+    TabsModule,
+    CheckboxModule,
+    TextareaModule,
   ],
   templateUrl: './categories.html',
   styleUrl: './categories.scss',
@@ -39,7 +45,20 @@ export class CategoriesComponent implements OnInit {
   editingId = signal<string | null>(null);
 
   form = { name: '', slug: '', parentId: null as string | null };
+  categoryActiveTab: string | number = '0';
 
+  seoForm = {
+    metaTitle: '',
+    metaDescription: '',
+    canonicalUrl: '',
+    noIndex: false,
+    ogTitle: '',
+    ogDescription: '',
+    ogImage: '',
+    twitterTitle: '',
+    twitterDescription: '',
+    twitterImage: '',
+  };
   constructor(private http: HttpService) {}
 
   async ngOnInit() {
@@ -53,12 +72,26 @@ export class CategoriesComponent implements OnInit {
   }
 
   openDialog(category?: Category) {
+    this.categoryActiveTab = '0';
     if (category) {
       this.editingId.set(category.id);
       this.form = { name: category.name, slug: category.slug, parentId: category.parentId };
+      void this.loadSeo(category.id);
     } else {
       this.editingId.set(null);
       this.form = { name: '', slug: '', parentId: null };
+      this.seoForm = {
+        metaTitle: '',
+        metaDescription: '',
+        canonicalUrl: '',
+        noIndex: false,
+        ogTitle: '',
+        ogDescription: '',
+        ogImage: '',
+        twitterTitle: '',
+        twitterDescription: '',
+        twitterImage: '',
+      };
     }
     this.dialogVisible = true;
   }
@@ -82,10 +115,35 @@ export class CategoriesComponent implements OnInit {
       .replace(/[^a-z0-9-]/g, '');
   }
 
+  async loadSeo(categoryId: string) {
+    try {
+      const seo = await this.http.get<typeof this.seoForm | null>(`/seo/category/${categoryId}`);
+      if (seo) {
+        this.seoForm = {
+          metaTitle: seo.metaTitle ?? '',
+          metaDescription: seo.metaDescription ?? '',
+          canonicalUrl: seo.canonicalUrl ?? `https://bearandroo.com.tr/kategori/${this.form.slug}`,
+          noIndex: seo.noIndex ?? false,
+          ogTitle: seo.ogTitle ?? '',
+          ogDescription: seo.ogDescription ?? '',
+          ogImage: seo.ogImage ?? '',
+          twitterTitle: seo.twitterTitle ?? '',
+          twitterDescription: seo.twitterDescription ?? '',
+          twitterImage: seo.twitterImage ?? '',
+        };
+      } else {
+        this.seoForm.canonicalUrl = `https://bearandroo.com.tr/kategori/${this.form.slug}`;
+      }
+    } catch {
+      this.seoForm.canonicalUrl = `https://bearandroo.com.tr/kategori/${this.form.slug}`;
+    }
+  }
+
   async save() {
     this.saving.set(true);
     if (this.editingId()) {
       await this.http.put(`/categories/${this.editingId()}`, this.form);
+      await this.http.put(`/seo/category/${this.editingId()}`, this.seoForm);
     } else {
       await this.http.post('/categories', this.form);
     }
