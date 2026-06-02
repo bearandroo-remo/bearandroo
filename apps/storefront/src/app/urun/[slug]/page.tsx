@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { getProductBySlug, getSeoByProduct } from '@/lib/api';
 import type { Product, Seo } from '@/lib/types';
 import type { Metadata } from 'next';
