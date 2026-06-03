@@ -47,6 +47,8 @@ model Category {
   products Product[]
   seo      Seo?
 
+  order Int @default(0)
+
   @@map("categories")
 }
 
@@ -66,6 +68,8 @@ model Product {
   variants Variant[]
   images   ProductImage[]
   seo      Seo?
+
+  collections CollectionProduct[]
 
   @@map("products")
 }
@@ -168,8 +172,43 @@ model Seo {
   product  Product?  @relation(fields: [productId], references: [id])
   category Category? @relation(fields: [categoryId], references: [id])
 
+  collectionId String?     @unique
+  collection   Collection? @relation(fields: [collectionId], references: [id])
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("seo")
+}
+
+model Collection {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  image       String?
+  isActive    Boolean   @default(true)
+  startDate   DateTime?
+  endDate     DateTime?
+  order       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  products CollectionProduct[]
+  seo      Seo?
+
+  @@map("collections")
+}
+
+model CollectionProduct {
+  id           String @id @default(cuid())
+  collectionId String
+  productId    String
+  order        Int    @default(0)
+
+  collection Collection @relation(fields: [collectionId], references: [id])
+  product    Product    @relation(fields: [productId], references: [id])
+
+  @@unique([collectionId, productId])
+  @@map("collection_products")
 }
