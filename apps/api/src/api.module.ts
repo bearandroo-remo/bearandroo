@@ -11,6 +11,7 @@ import { VariantModule } from './variant/variant.module';
 import { ImageModule } from './image/image.module';
 import { SeoModule } from './seo/seo.module';
 import { CollectionModule } from './collection/collection.module';
+import { BrandModule } from './brand/brand.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { CollectionModule } from './collection/collection.module';
     ImageModule,
     SeoModule,
     CollectionModule,
+    BrandModule,
   ],
   controllers: [ApiController],
   providers: [ApiService, PrismaService],

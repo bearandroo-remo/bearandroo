@@ -24,8 +24,45 @@ export class ProductController {
   constructor(private productService: ProductService) {}
 
   @Get()
-  findAll(@Query('categoryId') categoryId?: string) {
-    return this.productService.findAll(categoryId);
+  findAll(
+    @Query('categoryId') categoryId?: string,
+    @Query('brandId') brandId?: string,
+    @Query('collectionId') collectionId?: string,
+    @Query('minPrice') minPrice?: string,
+    @Query('maxPrice') maxPrice?: string,
+    @Query('inStock') inStock?: string,
+    @Query('fulfillmentType') fulfillmentType?: string,
+    @Query('sortBy') sortBy?: string,
+    @Query() query?: Record<string, string>,
+  ) {
+    const reservedKeys = [
+      'categoryId',
+      'brandId',
+      'collectionId',
+      'minPrice',
+      'maxPrice',
+      'inStock',
+      'fulfillmentType',
+      'sortBy',
+    ];
+    const attributes: Record<string, string> = {};
+    if (query) {
+      for (const [key, value] of Object.entries(query)) {
+        if (!reservedKeys.includes(key)) attributes[key] = value;
+      }
+    }
+
+    return this.productService.findAll(
+      categoryId,
+      brandId,
+      collectionId,
+      Object.keys(attributes).length > 0 ? attributes : undefined,
+      minPrice ? parseFloat(minPrice) : undefined,
+      maxPrice ? parseFloat(maxPrice) : undefined,
+      inStock === 'true',
+      fulfillmentType,
+      sortBy,
+    );
   }
 
   @Get(':slug')
@@ -57,5 +94,14 @@ export class ProductController {
   @Roles('ADMIN')
   remove(@Param('id') id: string) {
     return this.productService.remove(id);
+  }
+
+  @Get('filters')
+  getFilters(
+    @Query('categoryId') categoryId?: string,
+    @Query('brandId') brandId?: string,
+    @Query('collectionId') collectionId?: string,
+  ) {
+    return this.productService.getFilters(categoryId, brandId, collectionId);
   }
 }

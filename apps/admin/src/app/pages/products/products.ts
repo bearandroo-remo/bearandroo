@@ -10,6 +10,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 import { HttpService } from '../../http.service';
+import { InputNumberModule } from 'primeng/inputnumber';
 
 interface Category {
   id: string;
@@ -31,6 +32,9 @@ interface Product {
   isActive: boolean;
   variants: unknown[];
   images: ProductImage[];
+  brandId: string | null;
+  fulfillmentType: string;
+  productionDays: number | null;
 }
 
 @Component({
@@ -45,6 +49,7 @@ interface Product {
     TextareaModule,
     SelectModule,
     TagModule,
+    InputNumberModule,
   ],
   templateUrl: './products.html',
   styleUrl: './products.scss',
@@ -57,7 +62,23 @@ export class ProductsComponent implements OnInit {
   dialogVisible = false;
   editingId = signal<string | null>(null);
 
-  form = { name: '', slug: '', description: '', categoryId: null as string | null };
+  brands = signal<{ id: string; name: string }[]>([]);
+
+  fulfillmentOptions = [
+    { label: 'Stokta Var', value: 'READY' },
+    { label: 'Sipariş Üzerine Üretim', value: 'MADE_TO_ORDER' },
+    { label: 'Ön Sipariş', value: 'PRE_ORDER' },
+  ];
+
+  form = {
+    name: '',
+    slug: '',
+    description: '',
+    categoryId: null as string | null,
+    brandId: null as string | null,
+    fulfillmentType: 'READY',
+    productionDays: null as number | null,
+  };
 
   constructor(
     private http: HttpService,
@@ -65,7 +86,11 @@ export class ProductsComponent implements OnInit {
   ) {}
 
   async ngOnInit() {
-    await Promise.all([this.load(), this.loadCategories()]);
+    await Promise.all([this.load(), this.loadCategories(), this.loadBrands()]);
+  }
+
+  async loadBrands() {
+    this.brands.set(await this.http.get<{ id: string; name: string }[]>('/brands'));
   }
 
   async load() {
@@ -95,10 +120,21 @@ export class ProductsComponent implements OnInit {
         slug: product.slug,
         description: product.description ?? '',
         categoryId: product.categoryId,
+        brandId: product.brandId ?? null,
+        fulfillmentType: product.fulfillmentType ?? 'READY',
+        productionDays: product.productionDays ?? null,
       };
     } else {
       this.editingId.set(null);
-      this.form = { name: '', slug: '', description: '', categoryId: null };
+      this.form = {
+        name: '',
+        slug: '',
+        description: '',
+        categoryId: null,
+        brandId: null,
+        fulfillmentType: 'READY',
+        productionDays: null,
+      };
     }
     this.dialogVisible = true;
   }

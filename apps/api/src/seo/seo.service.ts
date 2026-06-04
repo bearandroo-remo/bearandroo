@@ -38,6 +38,20 @@ export class SeoService {
     return this.prisma.seo.findUnique({ where: { categoryId } });
   }
 
+  upsertForCollection(collectionId: string, dto: UpsertSeoDto) {
+    return this.prisma.seo.upsert({
+      where: { collectionId },
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      create: { ...(dto as any), collectionId },
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      update: { ...(dto as any) },
+    });
+  }
+
+  findByCollection(collectionId: string) {
+    return this.prisma.seo.findUnique({ where: { collectionId } });
+  }
+
   async generateSchemaOrg(productId: string) {
     const product = await this.prisma.product.findUnique({
       where: { id: productId },

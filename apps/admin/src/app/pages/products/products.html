@@ -58,6 +58,21 @@
               [(ngModel)]="form.categoryId" placeholder="Seç" [showClear]="true"
               appendTo="body" class="w-full" />
   </div>
+  <div class="field">
+    <label>Marka</label>
+    <p-select [options]="brands()" optionLabel="name" optionValue="id"
+              [(ngModel)]="form.brandId" placeholder="Seç" [showClear]="true"
+              appendTo="body" class="w-full" />
+  </div>
+  <div class="field">
+    <label>Fulfillment Tipi</label>
+    <p-select [options]="fulfillmentOptions" optionLabel="label" optionValue="value"
+              [(ngModel)]="form.fulfillmentType" appendTo="body" class="w-full" />
+  </div>
+  <div class="field" *ngIf="form.fulfillmentType !== 'READY'">
+    <label>Üretim Süresi (gün)</label>
+    <p-inputnumber [(ngModel)]="form.productionDays" [useGrouping]="false" [min]="0" class="w-full" />
+  </div>
   <ng-template pTemplate="footer">
     <p-button label="İptal" severity="secondary" (onClick)="dialogVisible = false" />
     <p-button label="Kaydet" (onClick)="save()" [loading]="saving()" />

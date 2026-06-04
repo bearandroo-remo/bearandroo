@@ -1,0 +1,151 @@
+<div class="page">
+  <div class="page-header">
+    <h1>Koleksiyonlar</h1>
+    <p-button label="Yeni Koleksiyon" icon="pi pi-plus" (onClick)="openDialog()" />
+  </div>
+
+  <p-table [value]="collections()" [loading]="loading()">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Ad</th>
+        <th>Slug</th>
+        <th>Ürün Sayısı</th>
+        <th>Durum</th>
+        <th>Sıra</th>
+        <th>İşlem</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-collection>
+      <tr>
+        <td>{{ collection.name }}</td>
+        <td>{{ collection.slug }}</td>
+        <td>{{ collection.products.length }}</td>
+        <td>
+          <p-tag [value]="collection.isActive ? 'Aktif' : 'Pasif'"
+                 [severity]="collection.isActive ? 'success' : 'danger'" />
+        </td>
+        <td>{{ collection.order }}</td>
+        <td>
+          <p-button icon="pi pi-list" severity="info" [text]="true" (onClick)="openProducts(collection)" />
+          <p-button icon="pi pi-pencil" severity="secondary" [text]="true" (onClick)="openDialog(collection)" />
+          <p-button icon="pi pi-trash" severity="danger" [text]="true" (onClick)="delete(collection.id)" />
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- Koleksiyon Dialog -->
+<p-dialog [(visible)]="dialogVisible" [header]="editingId() ? 'Koleksiyon Düzenle' : 'Yeni Koleksiyon'"
+          [modal]="true" [style]="{width: '500px'}">
+  <div class="field">
+    <label>Ad</label>
+    <input pInputText [(ngModel)]="form.name" (ngModelChange)="autoSlug($event)" class="w-full" />
+  </div>
+  <div class="field">
+    <label>Slug</label>
+    <input pInputText [(ngModel)]="form.slug" class="w-full" />
+  </div>
+  <div class="field">
+    <label>Açıklama</label>
+    <textarea pTextarea [(ngModel)]="form.description" rows="3" class="w-full"></textarea>
+  </div>
+  <div class="field">
+    <label>Sıra</label>
+    <p-inputnumber [(ngModel)]="form.order" [useGrouping]="false" class="w-full" />
+  </div>
+  <div class="field">
+    <label>Aktif</label>
+    <p-checkbox [(ngModel)]="form.isActive" [binary]="true" />
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button label="İptal" severity="secondary" (onClick)="dialogVisible = false" />
+    <p-button label="Kaydet" (onClick)="save()" [loading]="saving()" />
+  </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="dialogVisible" [header]="editingId() ? 'Koleksiyon Düzenle' : 'Yeni Koleksiyon'"
+          [modal]="true" [style]="{width: '500px'}">
+  <p-tabs [value]="activeTab" (valueChange)="activeTab = $any($event)">
+    <p-tablist>
+      <p-tab value="0">Genel</p-tab>
+      <p-tab value="1" [disabled]="!editingId()">SEO</p-tab>
+    </p-tablist>
+    <p-tabpanels>
+      <!-- Genel -->
+      <p-tabpanel value="0">
+        <div class="field">
+          <label>Ad</label>
+          <input pInputText [(ngModel)]="form.name" (ngModelChange)="autoSlug($event)" class="w-full" />
+        </div>
+        <div class="field">
+          <label>Slug</label>
+          <input pInputText [(ngModel)]="form.slug" class="w-full" />
+        </div>
+        <div class="field">
+          <label>Açıklama</label>
+          <textarea pTextarea [(ngModel)]="form.description" rows="3" class="w-full"></textarea>
+        </div>
+        <div class="field">
+          <label>Sıra</label>
+          <p-inputnumber [(ngModel)]="form.order" [useGrouping]="false" class="w-full" />
+        </div>
+        <div class="field">
+          <label>Aktif</label>
+          <p-checkbox [(ngModel)]="form.isActive" [binary]="true" />
+        </div>
+      </p-tabpanel>
+
+      <!-- SEO -->
+      <p-tabpanel value="1">
+        <div class="field">
+          <label>Meta Title</label>
+          <input pInputText [(ngModel)]="seoForm.metaTitle" class="w-full" placeholder="60 karakter önerilir" />
+        </div>
+        <div class="field">
+          <label>Meta Description</label>
+          <textarea pTextarea [(ngModel)]="seoForm.metaDescription" rows="3" class="w-full" placeholder="160 karakter önerilir"></textarea>
+        </div>
+        <div class="field">
+          <label>Canonical URL</label>
+          <input pInputText [(ngModel)]="seoForm.canonicalUrl" class="w-full" />
+        </div>
+        <div class="field">
+          <label>No Index</label>
+          <p-checkbox [(ngModel)]="seoForm.noIndex" [binary]="true" />
+        </div>
+        <h3>Open Graph</h3>
+        <div class="field">
+          <label>OG Title</label>
+          <input pInputText [(ngModel)]="seoForm.ogTitle" class="w-full" />
+        </div>
+        <div class="field">
+          <label>OG Description</label>
+          <textarea pTextarea [(ngModel)]="seoForm.ogDescription" rows="2" class="w-full"></textarea>
+        </div>
+        <div class="field">
+          <label>OG Image URL</label>
+          <input pInputText [(ngModel)]="seoForm.ogImage" class="w-full" />
+        </div>
+        <h3>Twitter/X</h3>
+        <div class="field">
+          <label>Twitter Title</label>
+          <input pInputText [(ngModel)]="seoForm.twitterTitle" class="w-full" />
+        </div>
+        <div class="field">
+          <label>Twitter Description</label>
+          <textarea pTextarea [(ngModel)]="seoForm.twitterDescription" rows="2" class="w-full"></textarea>
+        </div>
+        <div class="field">
+          <label>Twitter Image URL</label>
+          <input pInputText [(ngModel)]="seoForm.twitterImage" class="w-full" />
+        </div>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+
+  <ng-template pTemplate="footer">
+    <p-button label="İptal" severity="secondary" (onClick)="dialogVisible = false" />
+    <p-button label="Kaydet" (onClick)="save()" [loading]="saving()" />
+  </ng-template>
+</p-dialog>

@@ -43,4 +43,19 @@ export class SeoController {
   generateSchema(@Param('productId') productId: string) {
     return this.seoService.generateSchemaOrg(productId);
   }
+
+  @Get('collection/:collectionId')
+  findByCollection(@Param('collectionId') collectionId: string) {
+    return this.seoService.findByCollection(collectionId);
+  }
+
+  @Put('collection/:collectionId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  upsertForCollection(
+    @Param('collectionId') collectionId: string,
+    @Body() dto: UpsertSeoDto,
+  ) {
+    return this.seoService.upsertForCollection(collectionId, dto);
+  }
 }
