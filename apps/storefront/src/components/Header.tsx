@@ -2,10 +2,10 @@ import Link from 'next/link';
 import { getCategories } from '@/lib/api';
 import type { Category } from '@/lib/types';
 import CartIcon from '@/components/CartIcon';
+import NavMenu from '@/components/NavMenu';
 
 export default async function Header() {
   const categories = (await getCategories()) as Category[];
-  const mainCategories = categories.filter((c) => !c.parentId);
 
   return (
     <header
@@ -26,19 +26,8 @@ export default async function Header() {
             Bearandroo
           </Link>
 
-          {/* Kategoriler */}
-          <nav className="hidden md:flex items-center gap-6">
-            {mainCategories.map((cat: Category) => (
-              <Link
-                key={cat.id}
-                href={`/kategori/${cat.slug}`}
-                className="text-sm font-medium transition hover:opacity-70"
-                style={{ color: 'var(--color-text)' }}
-              >
-                {cat.name}
-              </Link>
-            ))}
-          </nav>
+          {/* Nav Menu */}
+          <NavMenu categories={categories} />
 
           {/* Sepet */}
           <CartIcon />
