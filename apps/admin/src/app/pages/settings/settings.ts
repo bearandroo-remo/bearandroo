@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Component, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -13,6 +15,8 @@ interface HeaderLink {
   label: string;
   type: string;
   slug: string;
+  badge?: string;
+  highlight?: boolean;
 }
 
 interface SocialLinks {
@@ -123,7 +127,7 @@ export class SettingsComponent implements OnInit {
   }
 
   addHeaderLink() {
-    this.headerLinks.push({ label: '', type: 'category', slug: '' });
+    this.headerLinks.push({ label: '', type: 'category', slug: '', badge: '', highlight: false });
   }
 
   removeHeaderLink(index: number) {

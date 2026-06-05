@@ -96,6 +96,8 @@
             <p-select [options]="linkTypeOptions" optionLabel="label" optionValue="value"
                       [(ngModel)]="link.type" appendTo="body" />
             <input pInputText [(ngModel)]="link.slug" placeholder="Slug veya URL" />
+            <input pInputText [(ngModel)]="link.badge" placeholder="Badge (örn: YENİ)" style="width: 80px" />
+            <p-checkbox [(ngModel)]="link.highlight" [binary]="true" />
             <p-button icon="pi pi-trash" severity="danger" [text]="true" (onClick)="removeHeaderLink(i)" />
           </div>
           <p-button label="Link Ekle" icon="pi pi-plus" severity="secondary" size="small" (onClick)="addHeaderLink()" />
