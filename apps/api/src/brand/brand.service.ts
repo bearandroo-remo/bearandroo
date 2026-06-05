@@ -1,11 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import {
-  Injectable,
-  NotFoundException,
-
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
@@ -16,13 +9,13 @@ export { CreateBrandDto, UpdateBrandDto };
 export class BrandService {
   constructor(private prisma: PrismaService) {}
 
-  create(dto: CreateBrandDto) {
-    return this.prisma.brand.create({ data: dto });
+  create(dto: CreateBrandDto, tenantId: string) {
+    return this.prisma.brand.create({ data: { ...dto, tenantId } });
   }
 
-  findAll() {
+  findAll(tenantId: string) {
     return this.prisma.brand.findMany({
-      where: { isActive: true },
+      where: { isActive: true, tenantId },
       orderBy: { name: 'asc' },
     });
   }

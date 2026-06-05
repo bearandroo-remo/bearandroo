@@ -44,24 +44,22 @@ export class ImageService {
   async uploadImage(
     file: Express.Multer.File,
     productId: string,
+    tenantSlug: string,
     variantId?: string,
     isMain = false,
   ) {
     if (!file) throw new BadRequestException('No file provided');
 
     const timestamp = Date.now();
-    const baseName = `${productId}/${timestamp}`;
-
-    // Orijinal
+    const baseName = `${tenantSlug}/${productId}/${timestamp}`;
     const originalBuffer = file.buffer;
-    const originalFilename = `${baseName}.webp`;
+
     const originalUrl = await this.uploadToBunny(
       await sharp(originalBuffer).webp({ quality: 85 }).toBuffer(),
-      originalFilename,
+      `${baseName}.webp`,
       'image/webp',
     );
 
-    // Thumbnail (400x400)
     const thumbBuffer = await sharp(originalBuffer)
       .resize(400, 400, { fit: 'cover' })
       .webp({ quality: 80 })
@@ -72,7 +70,6 @@ export class ImageService {
       'image/webp',
     );
 
-    // OG Image (1200x630)
     const ogBuffer = await sharp(originalBuffer)
       .resize(1200, 630, { fit: 'cover' })
       .webp({ quality: 85 })

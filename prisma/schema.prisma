@@ -14,7 +14,7 @@ datasource db {
 
 model User {
   id        String   @id @default(cuid())
-  email     String   @unique
+  email     String
   name      String?
   phone     String?
   password  String
@@ -23,60 +23,69 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id])
+
   cart Cart?
 
+  @@unique([email, tenantId])
   @@map("users")
 }
 
 enum Role {
+  SUPER_ADMIN
+  TENANT_ADMIN
   CUSTOMER
-  ADMIN
 }
-
-// ─── CATEGORY ────────────────────────────────────────────────────────────────
 
 model Category {
   id       String  @id @default(cuid())
   name     String
-  slug     String  @unique
+  slug     String
   parentId String?
   isActive Boolean @default(true)
+  order    Int     @default(0)
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
 
   parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id])
   children Category[] @relation("CategoryTree")
   products Product[]
   seo      Seo?
 
-  order Int @default(0)
-
+  @@unique([slug, tenantId])
+  @@index([tenantId])
   @@map("categories")
 }
-
-// ─── PRODUCT ─────────────────────────────────────────────────────────────────
 
 model Product {
   id          String   @id @default(cuid())
   name        String
-  slug        String   @unique
+  slug        String
   description String?
   categoryId  String?
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  category Category?      @relation(fields: [categoryId], references: [id])
-  variants Variant[]
-  images   ProductImage[]
-  seo      Seo?
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
 
+  category        Category?           @relation(fields: [categoryId], references: [id])
+  variants        Variant[]
+  images          ProductImage[]
+  seo             Seo?
   collections     CollectionProduct[]
   fulfillmentType FulfillmentType     @default(READY)
   productionDays  Int?
+  brandId         String?
+  brand           Brand?              @relation(fields: [brandId], references: [id])
+  details         ProductDetail[]
 
-  brandId String?
-  brand   Brand?          @relation(fields: [brandId], references: [id])
-  details ProductDetail[]
-
+  @@unique([slug, tenantId])
+  @@index([tenantId])
+  @@index([tenantId, categoryId])
   @@map("products")
 }
 
@@ -192,7 +201,7 @@ model Seo {
 model Collection {
   id          String    @id @default(cuid())
   name        String
-  slug        String    @unique
+  slug        String
   description String?
   image       String?
   isActive    Boolean   @default(true)
@@ -202,9 +211,14 @@ model Collection {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
   products CollectionProduct[]
   seo      Seo?
 
+  @@unique([slug, tenantId])
+  @@index([tenantId])
   @@map("collections")
 }
 
@@ -224,12 +238,17 @@ model CollectionProduct {
 model Brand {
   id       String  @id @default(cuid())
   name     String
-  slug     String  @unique
+  slug     String
   logo     String?
   isActive Boolean @default(true)
 
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
   products Product[]
 
+  @@unique([slug, tenantId])
+  @@index([tenantId])
   @@map("brands")
 }
 
@@ -256,4 +275,91 @@ enum FulfillmentType {
   READY
   MADE_TO_ORDER
   PRE_ORDER
+}
+
+// ─── TENANT ──────────────────────────────────────────────────────────────────
+
+model Tenant {
+  id        String     @id @default(cuid())
+  name      String
+  slug      String     @unique
+  domain    String?    @unique
+  apiKey    String     @unique @default(cuid())
+  isActive  Boolean    @default(true)
+  plan      TenantPlan @default(FREE)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  settings    TenantSettings?
+  users       User[]
+  products    Product[]
+  categories  Category[]
+  collections Collection[]
+  brands      Brand[]
+
+  @@map("tenants")
+}
+
+enum TenantPlan {
+  FREE
+  BASIC
+  PRO
+}
+
+model TenantSettings {
+  id       String @id @default(cuid())
+  tenantId String @unique
+
+  // Görünüm
+  logo    String?
+  favicon String?
+
+  // Renk Paleti
+  colorPrimary    String? @default("#8B6914")
+  colorSecondary  String? @default("#F5EFE6")
+  colorAccent     String? @default("#C4956A")
+  colorText       String? @default("#2C2C2C")
+  colorBackground String? @default("#FAFAF8")
+
+  // Typography
+  fontFamily   String? @default("Inter")
+  borderRadius String? @default("8px")
+
+  // Header
+  headerLinks Json?
+
+  // Hero / Slider
+  heroSlides Json?
+
+  // Footer
+  footerText  String?
+  footerLinks Json?
+  socialLinks Json?
+
+  // İletişim
+  email   String?
+  phone   String?
+  address String?
+
+  // SEO
+  siteTitle       String?
+  siteDescription String?
+
+  // Politikalar
+  shippingPolicy String?
+  returnPolicy   String?
+  privacyPolicy  String?
+  termsOfService String?
+
+  // FAQ
+  faq Json?
+
+  // Kargo
+  freeShippingThreshold Decimal? @db.Decimal(10, 2)
+  shippingCost          Decimal? @db.Decimal(10, 2)
+  estimatedDelivery     String?
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@map("tenant_settings")
 }

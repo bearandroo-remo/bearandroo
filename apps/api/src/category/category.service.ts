@@ -13,20 +13,19 @@ export { CreateCategoryDto, UpdateCategoryDto };
 export class CategoryService {
   constructor(private prisma: PrismaService) {}
 
-  async create(dto: CreateCategoryDto) {
+  async create(dto: CreateCategoryDto, tenantId: string) {
     const existing = await this.prisma.category.findUnique({
-      where: { slug: dto.slug },
+      where: { slug_tenantId: { slug: dto.slug, tenantId } },
     });
     if (existing) throw new ConflictException('Slug already in use');
-
-    return this.prisma.category.create({ data: dto });
+    return this.prisma.category.create({ data: { ...dto, tenantId } });
   }
 
-  async findAll() {
+  async findAll(tenantId: string) {
     return this.prisma.category.findMany({
-      where: { isActive: true },
-      include: { children: true },
-      orderBy: { name: 'asc' },
+      where: { isActive: true, tenantId },
+      include: { children: true, parent: true },
+      orderBy: { order: 'asc' },
     });
   }
 

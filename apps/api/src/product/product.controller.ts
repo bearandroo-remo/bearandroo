@@ -8,23 +8,40 @@ import {
   Param,
   Query,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import {
   ProductService,
   CreateProductDto,
   UpdateProductDto,
 } from './product.service';
-
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import * as tenantMiddleware from '../tenant/tenant.middleware';
 
 @Controller('products')
 export class ProductController {
   constructor(private productService: ProductService) {}
 
+  @Get('filters')
+  getFilters(
+    @Req() req: tenantMiddleware.TenantRequest,
+    @Query('categoryId') categoryId?: string,
+    @Query('brandId') brandId?: string,
+    @Query('collectionId') collectionId?: string,
+  ) {
+    return this.productService.getFilters(
+      req.tenantId!,
+      categoryId,
+      brandId,
+      collectionId,
+    );
+  }
+
   @Get()
   findAll(
+    @Req() req: tenantMiddleware.TenantRequest,
     @Query('categoryId') categoryId?: string,
     @Query('brandId') brandId?: string,
     @Query('collectionId') collectionId?: string,
@@ -53,6 +70,7 @@ export class ProductController {
     }
 
     return this.productService.findAll(
+      req.tenantId!,
       categoryId,
       brandId,
       collectionId,
@@ -65,43 +83,40 @@ export class ProductController {
     );
   }
 
-  @Get(':slug')
-  findBySlug(@Param('slug') slug: string) {
-    return this.productService.findBySlug(slug);
-  }
-
   @Get('id/:id')
   findById(@Param('id') id: string) {
     return this.productService.findById(id);
   }
 
+  @Get(':slug')
+  findBySlug(
+    @Param('slug') slug: string,
+    @Req() req: tenantMiddleware.TenantRequest,
+  ) {
+    return this.productService.findBySlug(slug, req.tenantId!);
+  }
+
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
-  create(@Body() dto: CreateProductDto) {
-    return this.productService.create(dto);
+  @Roles('TENANT_ADMIN', 'SUPER_ADMIN')
+  create(
+    @Body() dto: CreateProductDto,
+    @Req() req: tenantMiddleware.TenantRequest,
+  ) {
+    return this.productService.create(dto, req.tenantId!);
   }
 
   @Put(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles('TENANT_ADMIN', 'SUPER_ADMIN')
   update(@Param('id') id: string, @Body() dto: UpdateProductDto) {
     return this.productService.update(id, dto);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles('TENANT_ADMIN', 'SUPER_ADMIN')
   remove(@Param('id') id: string) {
     return this.productService.remove(id);
-  }
-
-  @Get('filters')
-  getFilters(
-    @Query('categoryId') categoryId?: string,
-    @Query('brandId') brandId?: string,
-    @Query('collectionId') collectionId?: string,
-  ) {
-    return this.productService.getFilters(categoryId, brandId, collectionId);
   }
 }

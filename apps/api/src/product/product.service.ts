@@ -4,7 +4,6 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
@@ -14,16 +13,16 @@ export { CreateProductDto, UpdateProductDto };
 export class ProductService {
   constructor(private prisma: PrismaService) {}
 
-  async create(dto: CreateProductDto) {
+  async create(dto: CreateProductDto, tenantId: string) {
     const existing = await this.prisma.product.findUnique({
-      where: { slug: dto.slug },
+      where: { slug_tenantId: { slug: dto.slug, tenantId } },
     });
     if (existing) throw new ConflictException('Slug already in use');
-
-    return this.prisma.product.create({ data: dto });
+    return this.prisma.product.create({ data: { ...dto, tenantId } });
   }
 
   async findAll(
+    tenantId: string,
     categoryId?: string,
     brandId?: string,
     collectionId?: string,
@@ -44,18 +43,16 @@ export class ProductService {
       productIds = collection?.products.map((p) => p.productId);
     }
 
-    const where: Record<string, unknown> = { isActive: true };
+    const where: Record<string, unknown> = { isActive: true, tenantId };
     if (categoryId) where['categoryId'] = categoryId;
     if (brandId) where['brandId'] = brandId;
     if (productIds) where['id'] = { in: productIds };
     if (fulfillmentType) where['fulfillmentType'] = fulfillmentType;
 
     const orderBy: Record<string, string> =
-      sortBy === 'price_asc'
+      sortBy === 'price_asc' || sortBy === 'price_desc'
         ? {}
-        : sortBy === 'price_desc'
-          ? {}
-          : { createdAt: 'desc' };
+        : { createdAt: 'desc' };
 
     let products = await this.prisma.product.findMany({
       where,
@@ -68,7 +65,6 @@ export class ProductService {
       orderBy,
     });
 
-    // Attribute filtresi
     if (attributes && Object.keys(attributes).length > 0) {
       products = products.filter((p) =>
         p.variants.some((v) => {
@@ -80,7 +76,6 @@ export class ProductService {
       );
     }
 
-    // Fiyat filtresi
     if (minPrice !== undefined || maxPrice !== undefined) {
       products = products.filter((p) =>
         p.variants.some((v) => {
@@ -92,12 +87,10 @@ export class ProductService {
       );
     }
 
-    // Stok filtresi
     if (inStock) {
       products = products.filter((p) => p.variants.some((v) => v.stock > 0));
     }
 
-    // Fiyat sıralaması
     if (sortBy === 'price_asc') {
       products.sort((a, b) => {
         const aMin = Math.min(...a.variants.map((v) => Number(v.price)));
@@ -120,23 +113,54 @@ export class ProductService {
       where: { id },
       include: {
         category: true,
+        brand: true,
         variants: { where: { isActive: true } },
         images: { orderBy: { order: 'asc' } },
+        details: { orderBy: { order: 'asc' } },
       },
     });
     if (!product) throw new NotFoundException('Product not found');
     return product;
   }
 
+  async findBySlug(slug: string, tenantId: string) {
+    const product = await this.prisma.product.findUnique({
+      where: { slug_tenantId: { slug, tenantId } },
+      include: {
+        category: true,
+        brand: true,
+        variants: { where: { isActive: true } },
+        images: { orderBy: { order: 'asc' } },
+        details: { orderBy: { order: 'asc' } },
+      },
+    });
+    if (!product) throw new NotFoundException('Product not found');
+    return product;
+  }
+
+  async findById(id: string) {
+    return this.findOne(id);
+  }
+
+  async update(id: string, dto: UpdateProductDto) {
+    await this.findOne(id);
+    return this.prisma.product.update({ where: { id }, data: dto });
+  }
+
+  async remove(id: string) {
+    await this.findOne(id);
+    return this.prisma.product.update({
+      where: { id },
+      data: { isActive: false },
+    });
+  }
+
   async getFilters(
+    tenantId: string,
     categoryId?: string,
     brandId?: string,
     collectionId?: string,
   ) {
-    const where: Record<string, unknown> = { isActive: true };
-    if (categoryId) where['categoryId'] = categoryId;
-    if (brandId) where['brandId'] = brandId;
-
     let productIds: string[] | undefined;
 
     if (collectionId) {
@@ -145,14 +169,16 @@ export class ProductService {
         include: { products: true },
       });
       productIds = collection?.products.map((p) => p.productId);
-      if (productIds) where['id'] = { in: productIds };
     }
+
+    const where: Record<string, unknown> = { isActive: true, tenantId };
+    if (categoryId) where['categoryId'] = categoryId;
+    if (brandId) where['brandId'] = brandId;
+    if (productIds) where['id'] = { in: productIds };
 
     const products = await this.prisma.product.findMany({
       where,
-      include: {
-        variants: { where: { isActive: true } },
-      },
+      include: { variants: { where: { isActive: true } } },
     });
 
     const attributeMap: Record<string, Set<string>> = {};
@@ -185,44 +211,5 @@ export class ProductService {
         max: maxPrice === -Infinity ? 0 : maxPrice,
       },
     };
-  }
-
-  async findBySlug(slug: string) {
-    const product = await this.prisma.product.findUnique({
-      where: { slug },
-      include: {
-        category: true,
-        variants: { where: { isActive: true } },
-        images: { orderBy: { order: 'asc' } },
-      },
-    });
-    if (!product) throw new NotFoundException('Product not found');
-    return product;
-  }
-
-  async findById(id: string) {
-    const product = await this.prisma.product.findUnique({
-      where: { id },
-      include: {
-        category: true,
-        variants: { where: { isActive: true } },
-        images: { orderBy: { order: 'asc' } },
-      },
-    });
-    if (!product) throw new NotFoundException('Product not found');
-    return product;
-  }
-
-  async update(id: string, dto: UpdateProductDto) {
-    await this.findOne(id);
-    return this.prisma.product.update({ where: { id }, data: dto });
-  }
-
-  async remove(id: string) {
-    await this.findOne(id);
-    return this.prisma.product.update({
-      where: { id },
-      data: { isActive: false },
-    });
   }
 }

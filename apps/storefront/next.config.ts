@@ -1,9 +1,3 @@
-import { setupDevPlatform } from '@cloudflare/next-on-pages/next-dev';
-
-if (process.env.NODE_ENV === 'development') {
-  await setupDevPlatform();
-}
-
 const nextConfig = {
   turbopack: {
     root: '../../',
@@ -15,9 +9,6 @@ const nextConfig = {
         hostname: 'bearandroo-storage.b-cdn.net',
       },
     ],
-  },
-  experimental: {
-    runtime: 'edge',
   },
 };
 

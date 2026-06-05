@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ApiController } from './api.controller';
 import { ApiService } from './api.service';
@@ -12,6 +12,9 @@ import { ImageModule } from './image/image.module';
 import { SeoModule } from './seo/seo.module';
 import { CollectionModule } from './collection/collection.module';
 import { BrandModule } from './brand/brand.module';
+import { TenantModule } from './tenant/tenant.module';
+import { TenantMiddleware } from './tenant/tenant.middleware';
+import { TenantSettingsModule } from './tenant-settings/tenant-settings.module';
 
 @Module({
   imports: [
@@ -27,9 +30,15 @@ import { BrandModule } from './brand/brand.module';
     SeoModule,
     CollectionModule,
     BrandModule,
+    TenantModule,
+    TenantSettingsModule,
   ],
   controllers: [ApiController],
   providers: [ApiService, PrismaService],
   exports: [PrismaService],
 })
-export class ApiModule {}
+export class ApiModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(TenantMiddleware).exclude('auth/*path').forRoutes('*');
+  }
+}

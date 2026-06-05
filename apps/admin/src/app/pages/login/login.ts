@@ -24,14 +24,21 @@ export class LoginComponent {
   async onLogin() {
     this.loading = true;
     try {
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (!environment.production) {
+        headers['x-api-key'] = environment.apiKey;
+      } else {
+        headers['x-tenant-domain'] = window.location.hostname;
+      }
+
       const res = await fetch(`${environment.apiUrl}/auth/login`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ email: this.email, password: this.password }),
       });
 
       const data = (await res.json()) as { accessToken: string; refreshToken: string };
-      console.log(data);
+
       if (res.ok) {
         localStorage.setItem('accessToken', data.accessToken);
         localStorage.setItem('refreshToken', data.refreshToken);
