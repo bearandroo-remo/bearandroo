@@ -10,6 +10,7 @@ import { SelectModule } from 'primeng/select';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { TabsModule } from 'primeng/tabs';
 import { HttpService } from '../../http.service';
+import { CheckboxModule } from 'primeng/checkbox';
 
 interface HeaderLink {
   label: string;
@@ -37,6 +38,7 @@ interface SocialLinks {
     SelectModule,
     InputNumberModule,
     TabsModule,
+    CheckboxModule,
   ],
   templateUrl: './settings.html',
   styleUrl: './settings.scss',
