@@ -18,6 +18,8 @@ interface Category {
   parentId: string | null;
   parent?: { name: string };
   isActive: boolean;
+  image?: string;
+  icon?: string;
 }
 
 @Component({
@@ -44,7 +46,7 @@ export class CategoriesComponent implements OnInit {
   dialogVisible = false;
   editingId = signal<string | null>(null);
 
-  form = { name: '', slug: '', parentId: null as string | null };
+  form = { name: '', slug: '', parentId: null as string | null, image: '', icon: '' };
   categoryActiveTab: string | number = '0';
 
   seoForm = {
@@ -75,23 +77,18 @@ export class CategoriesComponent implements OnInit {
     this.categoryActiveTab = '0';
     if (category) {
       this.editingId.set(category.id);
-      this.form = { name: category.name, slug: category.slug, parentId: category.parentId };
+      this.form = {
+        name: category.name,
+        slug: category.slug,
+        parentId: category.parentId,
+        image: category.image ?? '',
+        icon: category.icon ?? '',
+      };
       void this.loadSeo(category.id);
     } else {
       this.editingId.set(null);
-      this.form = { name: '', slug: '', parentId: null };
-      this.seoForm = {
-        metaTitle: '',
-        metaDescription: '',
-        canonicalUrl: '',
-        noIndex: false,
-        ogTitle: '',
-        ogDescription: '',
-        ogImage: '',
-        twitterTitle: '',
-        twitterDescription: '',
-        twitterImage: '',
-      };
+      this.form = { name: '', slug: '', parentId: null, image: '', icon: '' };
+      this.seoForm.canonicalUrl = `https://bearandroo.com.tr/kategori/${this.form.slug}`;
     }
     this.dialogVisible = true;
   }

@@ -1,11 +1,14 @@
 import Link from 'next/link';
-import { getCategories } from '@/lib/api';
+import { getCategories, getTenantSettings } from '@/lib/api';
 import type { Category } from '@/lib/types';
 import CartIcon from '@/components/CartIcon';
 import NavMenu from '@/components/NavMenu';
 
 export default async function Header() {
-  const categories = (await getCategories()) as Category[];
+  const [categories, settings] = await Promise.all([
+    getCategories() as Promise<Category[]>,
+    getTenantSettings(),
+  ]);
 
   return (
     <header
@@ -17,7 +20,6 @@ export default async function Header() {
     >
       <div className="max-w-6xl mx-auto px-6">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
           <Link
             href="/"
             className="font-bold text-xl"
@@ -26,10 +28,11 @@ export default async function Header() {
             Bearandroo
           </Link>
 
-          {/* Nav Menu */}
-          <NavMenu categories={categories} />
+          <NavMenu
+            categories={categories}
+            headerLinks={(settings?.headerLinks as never) ?? null}
+          />
 
-          {/* Sepet */}
           <CartIcon />
         </div>
       </div>

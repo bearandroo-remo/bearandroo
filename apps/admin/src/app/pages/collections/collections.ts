@@ -24,6 +24,8 @@ interface Collection {
   isActive: boolean;
   order: number;
   products: CollectionProduct[];
+  icon?: string;
+  image?: string;
 }
 
 interface Product {
@@ -60,7 +62,7 @@ export class CollectionsComponent implements OnInit {
   editingId = signal<string | null>(null);
   selectedProductId: string | null = null;
 
-  form = { name: '', slug: '', description: '', order: 0, isActive: true };
+  form = { name: '', slug: '', description: '', order: 0, isActive: true, icon: '', image: '' };
   activeTab: string | number = '0';
 
   seoForm = {
@@ -102,23 +104,22 @@ export class CollectionsComponent implements OnInit {
         description: collection.description ?? '',
         order: collection.order,
         isActive: collection.isActive,
+        icon: collection.icon ?? '',
+        image: collection.image ?? '',
       };
       void this.loadSeo(collection.id);
     } else {
       this.editingId.set(null);
-      this.form = { name: '', slug: '', description: '', order: 0, isActive: true };
-      this.seoForm = {
-        metaTitle: '',
-        metaDescription: '',
-        canonicalUrl: '',
-        noIndex: false,
-        ogTitle: '',
-        ogDescription: '',
-        ogImage: '',
-        twitterTitle: '',
-        twitterDescription: '',
-        twitterImage: '',
+      this.form = {
+        name: '',
+        slug: '',
+        description: '',
+        order: 0,
+        isActive: true,
+        icon: '',
+        image: '',
       };
+      this.seoForm.canonicalUrl = `https://bearandroo.com.tr/koleksiyon/${this.form.slug}`;
     }
     this.dialogVisible = true;
   }

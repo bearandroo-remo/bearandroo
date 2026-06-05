@@ -55,6 +55,14 @@
                     [(ngModel)]="form.parentId" placeholder="Seç" [showClear]="true"
                     appendTo="body" class="w-full" />
         </div>
+        <div class="field">
+          <label>Resim URL</label>
+          <input pInputText [(ngModel)]="form.image" class="w-full" placeholder="https://..." />
+        </div>
+        <div class="field">
+          <label>Icon (emoji veya CSS class)</label>
+          <input pInputText [(ngModel)]="form.icon" class="w-full" placeholder="👗 veya pi pi-tag" />
+        </div>
       </p-tabpanel>
 
       <!-- SEO -->

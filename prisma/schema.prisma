@@ -53,6 +53,8 @@ model Category {
   children Category[] @relation("CategoryTree")
   products Product[]
   seo      Seo?
+  image    String?
+  icon     String?
 
   @@unique([slug, tenantId])
   @@index([tenantId])
@@ -216,6 +218,7 @@ model Collection {
 
   products CollectionProduct[]
   seo      Seo?
+  icon     String?
 
   @@unique([slug, tenantId])
   @@index([tenantId])
