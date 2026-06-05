@@ -1,4 +1,3 @@
-
 'use client';
 export const runtime = 'edge';
 
@@ -12,14 +11,21 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <main className="max-w-6xl mx-auto px-6 py-16 text-center">
+      <main
+        className="max-w-6xl mx-auto px-6 py-16 text-center"
+        style={{ color: 'var(--color-text)' }}
+      >
         <h1 className="text-2xl font-bold mb-4">Sepetiniz boş</h1>
-        <p className="text-gray-500 mb-8">
+        <p className="mb-8 opacity-60">
           Alışverişe başlamak için ürünleri inceleyin.
         </p>
         <Link
           href="/"
-          className="bg-gray-900 text-white px-8 py-3 rounded-xl font-semibold hover:bg-gray-800 transition"
+          className="px-8 py-3 rounded-xl font-semibold transition hover:opacity-90"
+          style={{
+            backgroundColor: 'var(--color-primary)',
+            color: 'var(--color-background)',
+          }}
         >
           Alışverişe Başla
         </Link>
@@ -28,7 +34,10 @@ export default function CartPage() {
   }
 
   return (
-    <main className="max-w-6xl mx-auto px-6 py-12">
+    <main
+      className="max-w-6xl mx-auto px-6 py-12"
+      style={{ color: 'var(--color-text)' }}
+    >
       <h1 className="text-2xl font-bold mb-8">Sepetim</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -37,10 +46,17 @@ export default function CartPage() {
           {items.map((item) => (
             <div
               key={item.variantId}
-              className="bg-white border border-gray-200 rounded-xl p-4 flex gap-4"
+              className="rounded-xl p-4 flex gap-4"
+              style={{
+                backgroundColor: 'var(--color-background)',
+                border: '1px solid var(--color-secondary)',
+              }}
             >
               {item.imageUrl && (
-                <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                <div
+                  className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0"
+                  style={{ backgroundColor: 'var(--color-secondary)' }}
+                >
                   <Image
                     src={item.imageUrl}
                     alt={item.productName}
@@ -54,15 +70,21 @@ export default function CartPage() {
                 <Link
                   href={`/urun/${item.productSlug}`}
                   className="font-medium hover:underline"
+                  style={{ color: 'var(--color-text)' }}
                 >
                   {item.productName}
                 </Link>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm mt-1 opacity-60">
                   {Object.entries(item.variantAttributes)
                     .map(([k, v]) => `${k}: ${v}`)
                     .join(', ')}
                 </p>
-                <p className="font-semibold mt-1">{item.price.toFixed(2)} ₺</p>
+                <p
+                  className="font-semibold mt-1"
+                  style={{ color: 'var(--color-primary)' }}
+                >
+                  {item.price.toFixed(2)} ₺
+                </p>
               </div>
               <div className="flex flex-col items-end gap-2">
                 <div className="flex items-center gap-2">
@@ -70,7 +92,11 @@ export default function CartPage() {
                     onClick={() =>
                       updateQuantity(item.variantId, item.quantity - 1)
                     }
-                    className="w-8 h-8 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-100"
+                    className="w-8 h-8 rounded-lg flex items-center justify-center transition hover:opacity-80"
+                    style={{
+                      border: '1px solid var(--color-secondary)',
+                      color: 'var(--color-text)',
+                    }}
                   >
                     -
                   </button>
@@ -79,7 +105,11 @@ export default function CartPage() {
                     onClick={() =>
                       updateQuantity(item.variantId, item.quantity + 1)
                     }
-                    className="w-8 h-8 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-100"
+                    className="w-8 h-8 rounded-lg flex items-center justify-center transition hover:opacity-80"
+                    style={{
+                      border: '1px solid var(--color-secondary)',
+                      color: 'var(--color-text)',
+                    }}
                   >
                     +
                   </button>
@@ -96,26 +126,49 @@ export default function CartPage() {
         </div>
 
         {/* Özet */}
-        <div className="bg-white border border-gray-200 rounded-xl p-6 h-fit">
-          <h2 className="font-bold text-lg mb-4">Sipariş Özeti</h2>
-          <div className="flex justify-between mb-2">
-            <span className="text-gray-600">Ara Toplam</span>
+        <div
+          className="rounded-xl p-6 h-fit"
+          style={{
+            backgroundColor: 'var(--color-secondary)',
+            border: '1px solid var(--color-secondary)',
+          }}
+        >
+          <h2
+            className="font-bold text-lg mb-4"
+            style={{ color: 'var(--color-text)' }}
+          >
+            Sipariş Özeti
+          </h2>
+          <div className="flex justify-between mb-2 opacity-70">
+            <span>Ara Toplam</span>
             <span>{totalPrice.toFixed(2)} ₺</span>
           </div>
           <div className="flex justify-between mb-6">
-            <span className="text-gray-600">Kargo</span>
+            <span className="opacity-70">Kargo</span>
             <span className="text-green-600">Ücretsiz</span>
           </div>
-          <div className="border-t pt-4 flex justify-between font-bold text-lg mb-6">
+          <div
+            className="border-t pt-4 flex justify-between font-bold text-lg mb-6"
+            style={{ borderColor: 'var(--color-accent)' }}
+          >
             <span>Toplam</span>
-            <span>{totalPrice.toFixed(2)} ₺</span>
+            <span style={{ color: 'var(--color-primary)' }}>
+              {totalPrice.toFixed(2)} ₺
+            </span>
           </div>
-          <button className="w-full bg-gray-900 text-white py-4 rounded-xl font-semibold hover:bg-gray-800 transition">
+          <button
+            className="w-full py-4 rounded-xl font-semibold transition hover:opacity-90"
+            style={{
+              backgroundColor: 'var(--color-primary)',
+              color: 'var(--color-background)',
+            }}
+          >
             Ödemeye Geç
           </button>
           <button
             onClick={clearCart}
-            className="w-full mt-3 text-sm text-gray-500 hover:text-gray-700"
+            className="w-full mt-3 text-sm opacity-50 hover:opacity-80 transition"
+            style={{ color: 'var(--color-text)' }}
           >
             Sepeti Temizle
           </button>

@@ -14,14 +14,34 @@ export default async function HomePage() {
   const mainCategories = categories.filter((c) => !c.parentId);
 
   return (
-    <main className="min-h-screen">
+    <main
+      className="min-h-screen"
+      style={{ backgroundColor: 'var(--color-background)' }}
+    >
       {/* Hero */}
-      <section className="bg-gray-900 text-white py-20 px-6 text-center">
-        <h1 className="text-4xl font-bold mb-4">Bearandroo</h1>
-        <p className="text-gray-300 text-lg mb-8">Kaliteli tekstil ürünleri</p>
+      <section
+        className="py-20 px-6 text-center"
+        style={{ backgroundColor: 'var(--color-primary)' }}
+      >
+        <h1
+          className="text-4xl font-bold mb-4"
+          style={{ color: 'var(--color-background)' }}
+        >
+          Bearandroo
+        </h1>
+        <p
+          className="text-lg mb-8 opacity-80"
+          style={{ color: 'var(--color-secondary)' }}
+        >
+          Kaliteli tekstil ürünleri
+        </p>
         <Link
           href="/kategori"
-          className="bg-white text-gray-900 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition"
+          className="px-8 py-3 rounded-full font-semibold transition hover:opacity-90"
+          style={{
+            backgroundColor: 'var(--color-background)',
+            color: 'var(--color-primary)',
+          }}
         >
           Alışverişe Başla
         </Link>
@@ -29,13 +49,22 @@ export default async function HomePage() {
 
       {/* Kategoriler */}
       <section className="max-w-6xl mx-auto px-6 py-16">
-        <h2 className="text-2xl font-bold mb-8">Kategoriler</h2>
+        <h2
+          className="text-2xl font-bold mb-8"
+          style={{ color: 'var(--color-text)' }}
+        >
+          Kategoriler
+        </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {mainCategories.map((cat: Category) => (
             <Link
               key={cat.id}
               href={`/kategori/${cat.slug}`}
-              className="bg-gray-100 rounded-xl p-6 text-center hover:bg-gray-200 transition font-medium"
+              className="rounded-xl p-6 text-center font-medium transition hover:opacity-80"
+              style={{
+                backgroundColor: 'var(--color-secondary)',
+                color: 'var(--color-primary)',
+              }}
             >
               {cat.name}
             </Link>
@@ -45,7 +74,12 @@ export default async function HomePage() {
 
       {/* Yeni Ürünler */}
       <section className="max-w-6xl mx-auto px-6 pb-16">
-        <h2 className="text-2xl font-bold mb-8">Yeni Ürünler</h2>
+        <h2
+          className="text-2xl font-bold mb-8"
+          style={{ color: 'var(--color-text)' }}
+        >
+          Yeni Ürünler
+        </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {products.slice(0, 8).map((product: Product) => {
             const mainImage =
@@ -62,7 +96,10 @@ export default async function HomePage() {
                 href={`/urun/${product.slug}`}
                 className="group"
               >
-                <div className="aspect-square bg-gray-100 rounded-xl overflow-hidden mb-3">
+                <div
+                  className="aspect-square rounded-xl overflow-hidden mb-3"
+                  style={{ backgroundColor: 'var(--color-secondary)' }}
+                >
                   {mainImage ? (
                     <Image
                       src={mainImage.thumbUrl ?? mainImage.url}
@@ -72,14 +109,24 @@ export default async function HomePage() {
                       className="w-full h-full object-cover group-hover:scale-105 transition"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                    <div
+                      className="w-full h-full flex items-center justify-center"
+                      style={{ color: 'var(--color-accent)' }}
+                    >
                       Resim yok
                     </div>
                   )}
                 </div>
-                <h3 className="font-medium text-gray-900">{product.name}</h3>
+                <h3
+                  className="font-medium"
+                  style={{ color: 'var(--color-text)' }}
+                >
+                  {product.name}
+                </h3>
                 {minPrice && (
-                  <p className="text-gray-600 mt-1">{minPrice.toFixed(2)} ₺</p>
+                  <p className="mt-1" style={{ color: 'var(--color-primary)' }}>
+                    {minPrice.toFixed(2)} ₺
+                  </p>
                 )}
               </Link>
             );

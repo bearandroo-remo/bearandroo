@@ -8,11 +8,21 @@ export default async function Header() {
   const mainCategories = categories.filter((c) => !c.parentId);
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <header
+      className="sticky top-0 z-50 border-b"
+      style={{
+        backgroundColor: 'var(--color-background)',
+        borderColor: 'var(--color-secondary)',
+      }}
+    >
       <div className="max-w-6xl mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="font-bold text-xl text-gray-900">
+          <Link
+            href="/"
+            className="font-bold text-xl"
+            style={{ color: 'var(--color-primary)' }}
+          >
             Bearandroo
           </Link>
 
@@ -22,7 +32,8 @@ export default async function Header() {
               <Link
                 key={cat.id}
                 href={`/kategori/${cat.slug}`}
-                className="text-gray-600 hover:text-gray-900 text-sm font-medium transition"
+                className="text-sm font-medium transition hover:opacity-70"
+                style={{ color: 'var(--color-text)' }}
               >
                 {cat.name}
               </Link>

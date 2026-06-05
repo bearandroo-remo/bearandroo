@@ -49,8 +49,6 @@ export default function ProductDetail({ product }: Props) {
       ),
     );
 
-
-
     if (newVariant) {
       setSelectedVariant(newVariant);
       setSelectedImageIndex(0);
@@ -95,7 +93,7 @@ export default function ProductDetail({ product }: Props) {
               onClick={() => setSelectedImageIndex(index)}
               className={`aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 transition ${
                 index === selectedImageIndex
-                  ? 'border-gray-900'
+                  ? 'border-[var(--color-primary)]'
                   : 'border-transparent'
               }`}
             >
@@ -114,20 +112,33 @@ export default function ProductDetail({ product }: Props) {
       {/* Ürün Bilgileri */}
       <div>
         {product.category && (
-          <p className="text-sm text-gray-500 mb-2">{product.category.name}</p>
+          <p className="text-sm mb-2" style={{ color: 'var(--color-accent)' }}>
+            {product.category.name}
+          </p>
         )}
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">
+        <h1
+          className="text-3xl font-bold mb-4"
+          style={{ color: 'var(--color-text)' }}
+        >
           {product.name}
         </h1>
 
         {price !== null && (
-          <p className="text-2xl font-semibold text-gray-900 mb-6">
+          <p
+            className="text-2xl font-semibold mb-6"
+            style={{ color: 'var(--color-primary)' }}
+          >
             {price.toFixed(2)} ₺
           </p>
         )}
 
         {product.description && (
-          <p className="text-gray-600 mb-8">{product.description}</p>
+          <p
+            className="mb-8"
+            style={{ color: 'var(--color-text)', opacity: 0.7 }}
+          >
+            {product.description}
+          </p>
         )}
 
         {attributeKeys.map((key) => {
@@ -139,9 +150,15 @@ export default function ProductDetail({ product }: Props) {
 
           return (
             <div key={key} className="mb-6">
-              <h3 className="font-semibold mb-3 capitalize">
+              <h3
+                className="font-semibold mb-3 capitalize"
+                style={{ color: 'var(--color-text)' }}
+              >
                 {key}:{' '}
-                <span className="font-normal text-gray-600">
+                <span
+                  className="font-normal"
+                  style={{ color: 'var(--color-text)', opacity: 0.6 }}
+                >
                   {selectedVariant?.attributes[key] ?? ''}
                 </span>
               </h3>
@@ -157,11 +174,22 @@ export default function ProductDetail({ product }: Props) {
                       key={value}
                       onClick={() => handleAttributeSelect(key, value)}
                       disabled={!isAvailable}
+                      style={
+                        isSelected
+                          ? {
+                              backgroundColor: 'var(--color-primary)',
+                              borderColor: 'var(--color-primary)',
+                              color: '#fff',
+                            }
+                          : isAvailable
+                            ? {}
+                            : {}
+                      }
                       className={`border rounded-lg px-4 py-2 text-sm transition ${
                         isSelected
-                          ? 'border-gray-900 bg-gray-900 text-white'
+                          ? ''
                           : isAvailable
-                            ? 'border-gray-300 hover:border-gray-900'
+                            ? 'border-gray-300 hover:border-[var(--color-primary)]'
                             : 'border-gray-200 text-gray-400 cursor-not-allowed line-through'
                       }`}
                     >
@@ -183,14 +211,22 @@ export default function ProductDetail({ product }: Props) {
               : 'Stokta yok'}
           </p>
         )}
+
         <button
           disabled={!inStock || added}
           onClick={handleAddToCart}
+          style={
+            added
+              ? {}
+              : inStock
+                ? { backgroundColor: 'var(--color-primary)' }
+                : {}
+          }
           className={`w-full py-4 rounded-xl font-semibold transition ${
             added
               ? 'bg-green-600 text-white'
               : inStock
-                ? 'bg-gray-900 text-white hover:bg-gray-800'
+                ? 'text-white hover:opacity-90'
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
           }`}
         >
