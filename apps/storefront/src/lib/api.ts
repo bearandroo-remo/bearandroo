@@ -58,4 +58,5 @@ export async function getTenantSettings() {
   const text = await res.text();
   if (!text) return null;
   return JSON.parse(text);
+
 }
