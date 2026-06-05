@@ -1,0 +1,195 @@
+<div class="page">
+  <div class="page-header">
+    <h1>Mağaza Ayarları</h1>
+    <p-button label="Kaydet" icon="pi pi-save" (onClick)="save()" [loading]="saving()" />
+  </div>
+
+  <p-tabs [value]="activeTab" (valueChange)="activeTab = $any($event)">
+    <p-tablist>
+      <p-tab value="0">Görünüm</p-tab>
+      <p-tab value="1">Header</p-tab>
+      <p-tab value="2">Footer</p-tab>
+      <p-tab value="3">İletişim</p-tab>
+      <p-tab value="4">Kargo & İade</p-tab>
+      <p-tab value="5">SEO</p-tab>
+    </p-tablist>
+
+    <p-tabpanels>
+      <!-- Görünüm -->
+      <p-tabpanel value="0">
+        <div class="settings-grid">
+          <div class="field">
+            <label>Logo URL</label>
+            <input pInputText [(ngModel)]="form.logo" class="w-full" />
+          </div>
+          <div class="field">
+            <label>Favicon URL</label>
+            <input pInputText [(ngModel)]="form.favicon" class="w-full" />
+          </div>
+          <div class="field">
+            <label>Ana Renk</label>
+            <div class="color-field">
+              <input type="color" [(ngModel)]="form.colorPrimary" />
+              <input pInputText [(ngModel)]="form.colorPrimary" class="w-full" />
+            </div>
+          </div>
+          <div class="field">
+            <label>İkincil Renk</label>
+            <div class="color-field">
+              <input type="color" [(ngModel)]="form.colorSecondary" />
+              <input pInputText [(ngModel)]="form.colorSecondary" class="w-full" />
+            </div>
+          </div>
+          <div class="field">
+            <label>Vurgu Rengi</label>
+            <div class="color-field">
+              <input type="color" [(ngModel)]="form.colorAccent" />
+              <input pInputText [(ngModel)]="form.colorAccent" class="w-full" />
+            </div>
+          </div>
+          <div class="field">
+            <label>Metin Rengi</label>
+            <div class="color-field">
+              <input type="color" [(ngModel)]="form.colorText" />
+              <input pInputText [(ngModel)]="form.colorText" class="w-full" />
+            </div>
+          </div>
+          <div class="field">
+            <label>Arkaplan Rengi</label>
+            <div class="color-field">
+              <input type="color" [(ngModel)]="form.colorBackground" />
+              <input pInputText [(ngModel)]="form.colorBackground" class="w-full" />
+            </div>
+          </div>
+          <div class="field">
+            <label>Yazı Tipi</label>
+            <p-select [options]="fontOptions" optionLabel="label" optionValue="value"
+                      [(ngModel)]="form.fontFamily" appendTo="body" class="w-full" />
+          </div>
+          <div class="field">
+            <label>Border Radius</label>
+            <input pInputText [(ngModel)]="form.borderRadius" class="w-full" placeholder="8px" />
+          </div>
+        </div>
+
+        <!-- Renk Önizleme -->
+        <div class="color-preview" [ngStyle]="{
+  backgroundColor: form.colorBackground,
+  color: form.colorText,
+  borderRadius: form.borderRadius,
+  fontFamily: form.fontFamily
+}">
+          <h3 [ngStyle]="{ color: form.colorText }">Önizleme</h3>
+          <p>Bu metin ana renkte görünür.</p>
+          <button [ngStyle]="{ backgroundColor: form.colorPrimary, color: '#fff', borderRadius: form.borderRadius }">
+            Sepete Ekle
+          </button>
+        </div>
+      </p-tabpanel>
+
+      <!-- Header -->
+      <p-tabpanel value="1">
+        <div class="field">
+          <label>Header Linkleri</label>
+          <div *ngFor="let link of headerLinks; let i = index" class="link-row">
+            <input pInputText [(ngModel)]="link.label" placeholder="Etiket (örn: Kadın)" />
+            <p-select [options]="linkTypeOptions" optionLabel="label" optionValue="value"
+                      [(ngModel)]="link.type" appendTo="body" />
+            <input pInputText [(ngModel)]="link.slug" placeholder="Slug veya URL" />
+            <p-button icon="pi pi-trash" severity="danger" [text]="true" (onClick)="removeHeaderLink(i)" />
+          </div>
+          <p-button label="Link Ekle" icon="pi pi-plus" severity="secondary" size="small" (onClick)="addHeaderLink()" />
+        </div>
+      </p-tabpanel>
+
+      <!-- Footer -->
+      <p-tabpanel value="2">
+        <div class="field">
+          <label>Footer Metni</label>
+          <textarea pTextarea [(ngModel)]="form.footerText" rows="3" class="w-full"></textarea>
+        </div>
+        <div class="field">
+          <label>Sosyal Medya</label>
+          <div class="social-grid">
+            <div class="field">
+              <label>Instagram</label>
+              <input pInputText [(ngModel)]="socialLinks.instagram" class="w-full"
+                     placeholder="https://instagram.com/..." />
+            </div>
+            <div class="field">
+              <label>Facebook</label>
+              <input pInputText [(ngModel)]="socialLinks.facebook" class="w-full"
+                     placeholder="https://facebook.com/..." />
+            </div>
+            <div class="field">
+              <label>Twitter/X</label>
+              <input pInputText [(ngModel)]="socialLinks.twitter" class="w-full" placeholder="https://x.com/..." />
+            </div>
+            <div class="field">
+              <label>TikTok</label>
+              <input pInputText [(ngModel)]="socialLinks.tiktok" class="w-full" placeholder="https://tiktok.com/..." />
+            </div>
+          </div>
+        </div>
+      </p-tabpanel>
+
+      <!-- İletişim -->
+      <p-tabpanel value="3">
+        <div class="settings-grid">
+          <div class="field">
+            <label>E-posta</label>
+            <input pInputText [(ngModel)]="form.email" class="w-full" />
+          </div>
+          <div class="field">
+            <label>Telefon</label>
+            <input pInputText [(ngModel)]="form.phone" class="w-full" />
+          </div>
+          <div class="field" style="grid-column: 1 / -1">
+            <label>Adres</label>
+            <textarea pTextarea [(ngModel)]="form.address" rows="3" class="w-full"></textarea>
+          </div>
+        </div>
+      </p-tabpanel>
+
+      <!-- Kargo & İade -->
+      <p-tabpanel value="4">
+        <div class="settings-grid">
+          <div class="field">
+            <label>Ücretsiz Kargo Limiti (₺)</label>
+            <p-inputnumber [(ngModel)]="form.freeShippingThreshold" mode="decimal" [minFractionDigits]="2"
+                           class="w-full" />
+          </div>
+          <div class="field">
+            <label>Standart Kargo Ücreti (₺)</label>
+            <p-inputnumber [(ngModel)]="form.shippingCost" mode="decimal" [minFractionDigits]="2" class="w-full" />
+          </div>
+          <div class="field">
+            <label>Tahmini Teslimat</label>
+            <input pInputText [(ngModel)]="form.estimatedDelivery" class="w-full" placeholder="2-3 iş günü" />
+          </div>
+        </div>
+        <div class="field">
+          <label>Kargo Politikası</label>
+          <textarea pTextarea [(ngModel)]="form.shippingPolicy" rows="5" class="w-full"></textarea>
+        </div>
+        <div class="field">
+          <label>İade Politikası</label>
+          <textarea pTextarea [(ngModel)]="form.returnPolicy" rows="5" class="w-full"></textarea>
+        </div>
+      </p-tabpanel>
+
+      <!-- SEO -->
+      <p-tabpanel value="5">
+        <div class="field">
+          <label>Site Başlığı</label>
+          <input pInputText [(ngModel)]="form.siteTitle" class="w-full"
+                 placeholder="Bearandroo | Kaliteli Büyük Beden Giyim" />
+        </div>
+        <div class="field">
+          <label>Site Açıklaması</label>
+          <textarea pTextarea [(ngModel)]="form.siteDescription" rows="3" class="w-full"></textarea>
+        </div>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+</div>
