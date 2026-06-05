@@ -9,7 +9,8 @@ export default function CartIcon() {
   return (
     <Link
       href="/sepet"
-      className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition relative"
+      className="flex items-center gap-2 transition relative hover:opacity-70"
+      style={{ color: 'var(--color-text)' }}
     >
       <div className="relative">
         <svg
@@ -27,7 +28,13 @@ export default function CartIcon() {
           />
         </svg>
         {totalItems > 0 && (
-          <span className="absolute -top-2 -right-2 bg-gray-900 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+          <span
+            className="absolute -top-2 -right-2 text-xs rounded-full w-5 h-5 flex items-center justify-center"
+            style={{
+              backgroundColor: 'var(--color-primary)',
+              color: 'var(--color-background)',
+            }}
+          >
             {totalItems}
           </span>
         )}
