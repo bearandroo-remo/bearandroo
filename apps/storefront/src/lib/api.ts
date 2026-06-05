@@ -49,3 +49,13 @@ export async function getSeoByCategory(categoryId: string) {
   if (!text) return null;
   return JSON.parse(text);
 }
+
+export async function getTenantSettings() {
+  const res = await fetch(`${API_URL}/tenant-settings`, {
+    headers,
+    next: { revalidate: 60 },
+  });
+  const text = await res.text();
+  if (!text) return null;
+  return JSON.parse(text);
+}

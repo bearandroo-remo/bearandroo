@@ -1,4 +1,5 @@
 import { IsString, IsOptional, IsNumber } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class UpsertTenantSettingsDto {
   @IsString()
@@ -94,10 +95,12 @@ export class UpsertTenantSettingsDto {
 
   @IsNumber()
   @IsOptional()
+  @Type(() => Number)
   freeShippingThreshold?: number;
 
   @IsNumber()
   @IsOptional()
+  @Type(() => Number)
   shippingCost?: number;
 
   @IsString()
