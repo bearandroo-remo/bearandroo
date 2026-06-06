@@ -4,8 +4,11 @@ export const runtime = 'edge';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
+import { useRouter } from 'next/navigation';
 
 export default function CartPage() {
+  const router = useRouter();
+
   const { items, removeItem, updateQuantity, totalPrice, clearCart } =
     useCart();
 
@@ -157,6 +160,7 @@ export default function CartPage() {
             </span>
           </div>
           <button
+            onClick={() => router.push('/odeme')}
             className="w-full py-4 rounded-xl font-semibold transition hover:opacity-90"
             style={{
               backgroundColor: 'var(--color-primary)',
