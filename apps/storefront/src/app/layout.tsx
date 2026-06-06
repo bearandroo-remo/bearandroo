@@ -5,6 +5,7 @@ import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import { getTenantSettings } from '@/lib/api';
 import { CartProvider } from '@/context/CartContext';
+import { AuthProvider } from '@/context/AuthContext';
 
 
 const geistSans = Geist({
@@ -54,11 +55,13 @@ export default async function RootLayout({
         className="min-h-full flex flex-col"
         style={{ backgroundColor: settings?.colorBackground ?? '#FAFAF8' }}
       >
-        <CartProvider>
-          <Header />
-          {children}
-          <Footer />
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <Header />
+            {children}
+            <Footer />
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

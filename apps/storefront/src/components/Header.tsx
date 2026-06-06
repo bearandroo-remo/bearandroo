@@ -4,6 +4,7 @@ import type { Category } from '@/lib/types';
 import CartIcon from '@/components/CartIcon';
 import NavMenu from '@/components/NavMenu';
 import MobileMenu from '@/components/MobileMenu';
+import UserIcon from '@/components/UserIcon';
 
 export default async function Header() {
   const [categories, settings] = await Promise.all([
@@ -37,6 +38,7 @@ export default async function Header() {
             categories={categories}
             headerLinks={(settings?.headerLinks as never) ?? null}
           />
+          <UserIcon />
           <CartIcon />
         </div>
       </div>
