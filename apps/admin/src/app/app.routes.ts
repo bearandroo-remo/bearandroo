@@ -48,6 +48,11 @@ export const routes: Routes = [
         path: 'settings',
         loadComponent: () => import('./pages/settings/settings').then((m) => m.SettingsComponent),
       },
+      {
+        path: 'product-import',
+        loadComponent: () =>
+          import('./pages/product-import/product-import').then((m) => m.ProductImportComponent),
+      },
     ],
   },
   {

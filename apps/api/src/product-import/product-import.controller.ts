@@ -7,6 +7,7 @@ import {
   UploadedFile,
   Req,
   Res,
+  StreamableFile,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProductImportService } from './product-import.service';
@@ -14,7 +15,7 @@ import { JwtAuthGuard } from '../auth/jwt.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import * as tenantMiddleware from '../tenant/tenant.middleware';
-import express from 'express';
+import type { Response } from 'express';
 
 @Controller('product-import')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -23,17 +24,12 @@ export class ProductImportController {
   constructor(private productImportService: ProductImportService) {}
 
   @Get('template')
-  downloadTemplate(@Res() res: express.Response) {
+  downloadTemplate(): StreamableFile {
     const buffer = this.productImportService.generateTemplate();
-    res.setHeader(
-      'Content-Type',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    );
-    res.setHeader(
-      'Content-Disposition',
-      'attachment; filename=urun-import-template.xlsx',
-    );
-    res.send(buffer);
+    return new StreamableFile(buffer, {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      disposition: 'attachment; filename="urun-import-template.xlsx"',
+    });
   }
 
   @Post('validate')

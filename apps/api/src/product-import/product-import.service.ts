@@ -82,6 +82,7 @@ export class ProductImportService {
   generateTemplate(): Buffer {
     const wb = XLSX.utils.book_new();
 
+
     // Sheet 1 - Kategoriler
     const categoryData = [
       { name: 'Kadın', parentName: '', slug: 'kadin', order: 1, icon: '👗' },
@@ -184,8 +185,13 @@ export class ProductImportService {
       'Ürünler',
     );
 
-    const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
-    return buffer as Buffer;
+    const buffer = XLSX.write(wb, {
+      type: 'buffer',
+      bookType: 'xlsx',
+      compression: true,
+    });
+
+    return Buffer.from(buffer);
   }
 
   // ── Parse ─────────────────────────────────────────────────────────────────

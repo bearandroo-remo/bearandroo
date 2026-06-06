@@ -1,0 +1,124 @@
+<div class="page">
+  <div class="page-header">
+    <h1>Excel ile Ürün İçe Aktar</h1>
+    <p-button label="Template İndir" icon="pi pi-download" severity="secondary" (onClick)="downloadTemplate()" />
+  </div>
+
+  <!-- Adım 1: Dosya Yükle -->
+  <div class="card">
+    <div class="card-header">
+      <h2>1. Excel Dosyası Seç</h2>
+    </div>
+    <div class="field">
+      <p-fileupload
+        mode="basic"
+        name="file"
+        accept=".xlsx,.xls"
+        [auto]="false"
+        chooseLabel="Excel Seç"
+        (onSelect)="onFileSelect($event)"
+      />
+    </div>
+    <div *ngIf="selectedFile">
+      <p class="text-sm" style="color: var(--p-text-color)">
+        Seçilen dosya: <strong>{{ selectedFile.name }}</strong>
+      </p>
+      <p-button
+        label="Validate Et"
+        icon="pi pi-check"
+        class="mt-3"
+        [loading]="validating()"
+        (onClick)="validate()"
+      />
+    </div>
+  </div>
+
+  <!-- Adım 2: Validation Sonucu -->
+  <div class="card" *ngIf="validationResult()">
+    <div class="card-header">
+      <h2>2. Validation Sonucu</h2>
+    </div>
+
+    <!-- Özet -->
+    <div class="summary-grid">
+      <div class="summary-item">
+        <span class="label">Kategoriler</span>
+        <span class="value">{{ validationResult()!.summary.categories }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Markalar</span>
+        <span class="value">{{ validationResult()!.summary.brands }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Koleksiyonlar</span>
+        <span class="value">{{ validationResult()!.summary.collections }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Ürünler</span>
+        <span class="value">{{ validationResult()!.summary.products }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Variantlar</span>
+        <span class="value">{{ validationResult()!.summary.variants }}</span>
+      </div>
+    </div>
+
+    <!-- Yeni oluşturulacaklar -->
+    <div *ngIf="validationResult()!.summary.newCategories.length > 0" class="info-box">
+      <p><strong>Yeni kategoriler oluşturulacak:</strong> {{ validationResult()!.summary.newCategories.join(', ') }}</p>
+    </div>
+    <div *ngIf="validationResult()!.summary.newBrands.length > 0" class="info-box">
+      <p><strong>Yeni markalar oluşturulacak:</strong> {{ validationResult()!.summary.newBrands.join(', ') }}</p>
+    </div>
+    <div *ngIf="validationResult()!.summary.newCollections.length > 0" class="info-box">
+      <p><strong>Yeni koleksiyonlar oluşturulacak:</strong> {{ validationResult()!.summary.newCollections.join(', ') }}</p>
+    </div>
+    <div *ngIf="validationResult()!.summary.slugConflicts.length > 0" class="warning-box">
+      <p><strong>Mevcut ürünler güncellenecek:</strong> {{ validationResult()!.summary.slugConflicts.join(', ') }}</p>
+    </div>
+
+    <!-- Uyarılar -->
+    <div *ngIf="validationResult()!.warnings.length > 0" class="warning-box">
+      <p><strong>Uyarılar:</strong></p>
+      <ul>
+        <li *ngFor="let w of validationResult()!.warnings">{{ w }}</li>
+      </ul>
+    </div>
+
+    <!-- Hatalar -->
+    <div *ngIf="validationResult()!.errors.length > 0" class="error-box">
+      <p><strong>Hatalar ({{ validationResult()!.errors.length }}):</strong></p>
+      <ul>
+        <li *ngFor="let e of validationResult()!.errors">
+          [{{ e.sheet }}] Satır {{ e.row }} - {{ e.field }}: {{ e.message }}
+        </li>
+      </ul>
+    </div>
+
+    <!-- Import Butonu -->
+    <div *ngIf="validationResult()!.valid" class="mt-4">
+      <p-button
+        label="Import Et"
+        icon="pi pi-upload"
+        [loading]="importing()"
+        (onClick)="import()"
+      />
+    </div>
+  </div>
+
+  <!-- Adım 3: Import Sonucu -->
+  <div class="card" *ngIf="importResult()">
+    <div class="card-header">
+      <h2>3. Import Sonucu</h2>
+    </div>
+    <div class="success-box" *ngIf="importResult()!.imported > 0">
+      <p>✅ <strong>{{ importResult()!.imported }}</strong> ürün başarıyla import edildi!</p>
+    </div>
+    <div *ngIf="importResult()!.errors.length > 0" class="error-box">
+      <p><strong>Hatalar:</strong></p>
+      <ul>
+        <li *ngFor="let e of importResult()!.errors">{{ e }}</li>
+      </ul>
+    </div>
+  </div>
+</div>
