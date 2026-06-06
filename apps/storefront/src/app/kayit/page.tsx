@@ -20,7 +20,7 @@ export default function RegisterPage() {
     setError('');
     setLoading(true);
     try {
-      await register(email, password, name);
+      await register(email, password);
       router.push('/hesabim');
     } catch {
       setError('Kayıt sırasında bir hata oluştu.');
