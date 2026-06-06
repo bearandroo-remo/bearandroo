@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
 
-export default function SearchBar() {
+function SearchBarInner() {
   const [query, setQuery] = useState('');
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -80,5 +79,28 @@ export default function SearchBar() {
         </button>
       </div>
     </form>
+  );
+}
+
+export default function SearchBar() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex-1 max-w-md hidden md:flex">
+          <div
+            className="flex w-full rounded-xl overflow-hidden border"
+            style={{ borderColor: 'var(--color-secondary)' }}
+          >
+            <input
+              placeholder="Ürün, kategori ara..."
+              className="flex-1 px-4 py-2 text-sm outline-none"
+              style={{ backgroundColor: 'var(--color-background)' }}
+            />
+          </div>
+        </div>
+      }
+    >
+      <SearchBarInner />
+    </Suspense>
   );
 }
