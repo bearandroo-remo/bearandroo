@@ -50,6 +50,7 @@ export class ProductController {
     @Query('inStock') inStock?: string,
     @Query('fulfillmentType') fulfillmentType?: string,
     @Query('sortBy') sortBy?: string,
+    @Query('q') search?: string,
     @Query() query?: Record<string, string>,
   ) {
     const reservedKeys = [
@@ -61,6 +62,7 @@ export class ProductController {
       'inStock',
       'fulfillmentType',
       'sortBy',
+      'q',
     ];
     const attributes: Record<string, string> = {};
     if (query) {
@@ -80,6 +82,7 @@ export class ProductController {
       inStock === 'true',
       fulfillmentType,
       sortBy,
+      search,
     );
   }
 

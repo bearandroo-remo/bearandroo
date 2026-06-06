@@ -32,6 +32,7 @@ export class ProductService {
     inStock?: boolean,
     fulfillmentType?: string,
     sortBy?: string,
+    search?: string,
   ) {
     let productIds: string[] | undefined;
 
@@ -48,7 +49,12 @@ export class ProductService {
     if (brandId) where['brandId'] = brandId;
     if (productIds) where['id'] = { in: productIds };
     if (fulfillmentType) where['fulfillmentType'] = fulfillmentType;
-
+    if (search) {
+      where['OR'] = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
+      ];
+    }
     const orderBy: Record<string, string> =
       sortBy === 'price_asc' || sortBy === 'price_desc'
         ? {}
