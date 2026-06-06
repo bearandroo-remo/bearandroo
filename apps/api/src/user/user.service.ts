@@ -26,6 +26,9 @@ export class UserService {
   }
 
   async update(id: string, data: { name?: string; phone?: string }) {
-    return this.prisma.user.update({ where: { id }, data });
+    return this.prisma.user.updateMany({
+      where: { id },
+      data,
+    });
   }
 }

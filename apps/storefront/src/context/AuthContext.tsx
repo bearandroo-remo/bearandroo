@@ -5,6 +5,7 @@ import {
   useContext,
   useState,
   useEffect,
+  useCallback,
   ReactNode,
 } from 'react';
 
@@ -34,22 +35,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const refreshUser = useCallback(async (currentToken: string) => {
+    try {
+      const res = await fetch(`${API_URL}/users/me`, {
+        headers: {
+          Authorization: `Bearer ${currentToken}`,
+          'x-api-key': API_KEY ?? '',
+        },
+      });
+      if (res.ok) {
+        const data = (await res.json()) as User;
+        setUser({
+          id: data.id,
+          email: data.email,
+          name: data.name,
+          role: data.role,
+        });
+      }
+    } catch {
+      // token geçersiz
+    }
+  }, []);
+
   useEffect(() => {
     const stored = localStorage.getItem('customerToken');
     if (stored) {
       setToken(stored);
-      const payload = JSON.parse(atob(stored.split('.')[1])) as User & {
-        sub: string;
-      };
-      setUser({
-        id: payload.sub,
-        email: payload.email,
-        name: payload.name,
-        role: payload.role,
-      });
+      void refreshUser(stored).finally(() => setIsLoading(false));
+    } else {
+      setIsLoading(false);
     }
-    setIsLoading(false);
-  }, []);
+  }, [refreshUser]);
 
   const login = async (email: string, password: string) => {
     const res = await fetch(`${API_URL}/auth/login`, {
@@ -64,15 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const data = (await res.json()) as { accessToken: string };
     localStorage.setItem('customerToken', data.accessToken);
     setToken(data.accessToken);
-    const payload = JSON.parse(atob(data.accessToken.split('.')[1])) as User & {
-      sub: string;
-    };
-    setUser({
-      id: payload.sub,
-      email: payload.email,
-      name: payload.name,
-      role: payload.role,
-    });
+    await refreshUser(data.accessToken);
   };
 
   const register = async (email: string, password: string, name?: string) => {
@@ -88,15 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const data = (await res.json()) as { accessToken: string };
     localStorage.setItem('customerToken', data.accessToken);
     setToken(data.accessToken);
-    const payload = JSON.parse(atob(data.accessToken.split('.')[1])) as User & {
-      sub: string;
-    };
-    setUser({
-      id: payload.sub,
-      email: payload.email,
-      name: payload.name,
-      role: payload.role,
-    });
+    await refreshUser(data.accessToken);
   };
 
   const logout = () => {

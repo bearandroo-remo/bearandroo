@@ -44,6 +44,8 @@ export default function AccountPage() {
       },
       body: JSON.stringify({ name, phone }),
     });
+    // name'i local state'de de güncelle
+    setName(name);
     setSaved(true);
     setSaving(false);
     setTimeout(() => setSaved(false), 2000);
