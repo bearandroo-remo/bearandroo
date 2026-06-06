@@ -14,6 +14,14 @@ async function bootstrap() {
       'https://bearandroo.vercel.app',
       'https://bearandroo.com.tr',
     ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'x-api-key',
+      'x-tenant-domain',
+      'x-tenant-slug',
+    ],
     credentials: true,
   });
 
