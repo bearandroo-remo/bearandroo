@@ -278,7 +278,6 @@ export default function AddressesPage() {
               </h3>
               <form onSubmit={handleSubmit} className="space-y-3">
                 <input
-                  pInputText
                   placeholder="Adres başlığı (Ev, İş...)"
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
