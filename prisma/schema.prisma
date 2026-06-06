@@ -28,6 +28,8 @@ model User {
 
   cart Cart?
 
+  addresses Address[]
+
   @@unique([email, tenantId])
   @@map("users")
 }
@@ -365,4 +367,22 @@ model TenantSettings {
   tenant Tenant @relation(fields: [tenantId], references: [id])
 
   @@map("tenant_settings")
+}
+
+model Address {
+  id        String  @id @default(cuid())
+  userId    String
+  title     String // "Ev", "İş"
+  firstName String
+  lastName  String
+  phone     String
+  address   String
+  city      String
+  district  String?
+  zip       String?
+  isDefault Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("addresses")
 }

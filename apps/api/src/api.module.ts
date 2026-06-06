@@ -15,6 +15,7 @@ import { BrandModule } from './brand/brand.module';
 import { TenantModule } from './tenant/tenant.module';
 import { TenantMiddleware } from './tenant/tenant.middleware';
 import { TenantSettingsModule } from './tenant-settings/tenant-settings.module';
+import { AddressModule } from './address/address.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { TenantSettingsModule } from './tenant-settings/tenant-settings.module';
     BrandModule,
     TenantModule,
     TenantSettingsModule,
+    AddressModule,
   ],
   controllers: [ApiController],
   providers: [ApiService, PrismaService],
