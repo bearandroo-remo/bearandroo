@@ -1,0 +1,90 @@
+<div class="page">
+  <div class="page-header">
+    <h1>Tenant Yönetimi</h1>
+    <p-button label="Yeni Tenant" icon="pi pi-plus" (onClick)="openDialog()" />
+  </div>
+
+  <p-table [value]="tenants()" [loading]="loading()">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Ad</th>
+        <th>Slug</th>
+        <th>Domain</th>
+        <th>Plan</th>
+        <th>Ürünler</th>
+        <th>Kullanıcılar</th>
+        <th>Durum</th>
+        <th>İşlem</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-tenant>
+      <tr>
+        <td>{{ tenant.name }}</td>
+        <td>{{ tenant.slug }}</td>
+        <td>{{ tenant.domain ?? '-' }}</td>
+        <td>
+          <p-tag [value]="tenant.plan"
+                 [severity]="tenant.plan === 'PRO' ? 'success' : tenant.plan === 'BASIC' ? 'info' : 'secondary'" />
+        </td>
+        <td>{{ tenant._count.products }}</td>
+        <td>{{ tenant._count.users }}</td>
+        <td>
+          <p-tag [value]="tenant.isActive ? 'Aktif' : 'Pasif'"
+                 [severity]="tenant.isActive ? 'success' : 'danger'" />
+        </td>
+        <td>
+          <p-button icon="pi pi-pencil" severity="secondary" [text]="true" (onClick)="openDialog(tenant)" />
+          <p-button
+            [icon]="tenant.isActive ? 'pi pi-ban' : 'pi pi-check'"
+            [severity]="tenant.isActive ? 'danger' : 'success'"
+            [text]="true"
+            (onClick)="toggleActive(tenant)"
+          />
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- Dialog -->
+<p-dialog [(visible)]="dialogVisible" [header]="editingId() ? 'Tenant Düzenle' : 'Yeni Tenant'"
+          [modal]="true" [style]="{width: '500px'}">
+  <div class="field">
+    <label>Mağaza Adı</label>
+    <input pInputText [(ngModel)]="form.name" (ngModelChange)="autoSlug($event)" class="w-full" />
+  </div>
+  <div class="field">
+    <label>Slug</label>
+    <input pInputText [(ngModel)]="form.slug" class="w-full" [disabled]="!!editingId()" />
+  </div>
+  <div class="field">
+    <label>Domain</label>
+    <input pInputText [(ngModel)]="form.domain" class="w-full" placeholder="magaza.com.tr" />
+  </div>
+  <div class="field">
+    <label>Plan</label>
+    <p-select [options]="planOptions" optionLabel="label" optionValue="value"
+              [(ngModel)]="form.plan" appendTo="body" class="w-full" />
+  </div>
+
+  <div *ngIf="!editingId()">
+    <h3 style="margin: 1rem 0 0.5rem; font-size: 0.9rem; font-weight: 600;">Admin Kullanıcı</h3>
+    <div class="field">
+      <label>E-posta</label>
+      <input pInputText [(ngModel)]="form.adminEmail" class="w-full" type="email" />
+    </div>
+    <div class="field">
+      <label>Şifre</label>
+      <input pInputText [(ngModel)]="form.adminPassword" class="w-full" type="password" />
+    </div>
+    <div class="field">
+      <label>Ad Soyad</label>
+      <input pInputText [(ngModel)]="form.adminName" class="w-full" />
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="İptal" severity="secondary" (onClick)="dialogVisible = false" />
+    <p-button label="Kaydet" (onClick)="save()" [loading]="saving()" />
+  </ng-template>
+</p-dialog>

@@ -1,8 +1,12 @@
 .summary-grid {
   display: flex;
-  gap: 1.5rem;
+  gap: 1rem;
   flex-wrap: wrap;
   margin-bottom: 1.5rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 }
 
 .summary-item {
@@ -12,16 +16,33 @@
   padding: 1rem 1.5rem;
   border-radius: 8px;
   background: var(--p-surface-100);
+  flex: 1;
+  min-width: 100px;
+
+  @media (max-width: 768px) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+  }
 
   .label {
     font-size: 0.75rem;
     opacity: 0.6;
     margin-bottom: 0.25rem;
+
+    @media (max-width: 768px) {
+      margin-bottom: 0;
+    }
   }
 
   .value {
     font-size: 1.5rem;
     font-weight: 700;
+
+    @media (max-width: 768px) {
+      font-size: 1.25rem;
+    }
   }
 }
 
@@ -32,6 +53,7 @@
   padding: 0.75rem 1rem;
   margin-bottom: 0.75rem;
   font-size: 0.875rem;
+  word-break: break-word;
 }
 
 .warning-box {
@@ -41,6 +63,7 @@
   padding: 0.75rem 1rem;
   margin-bottom: 0.75rem;
   font-size: 0.875rem;
+  word-break: break-word;
 
   ul { margin: 0.5rem 0 0 1rem; padding: 0; }
 }
@@ -53,6 +76,7 @@
   margin-bottom: 0.75rem;
   font-size: 0.875rem;
   color: #991b1b;
+  word-break: break-word;
 
   ul { margin: 0.5rem 0 0 1rem; padding: 0; }
 }
@@ -64,6 +88,25 @@
   padding: 0.75rem 1rem;
   font-size: 0.875rem;
   color: #166534;
+}
+
+.page-header {
+  flex-wrap: wrap;
+  gap: 0.75rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .flex {
+      width: 100%;
+      flex-direction: column;
+
+      p-button {
+        width: 100%;
+      }
+    }
+  }
 }
 
 .mt-3 { margin-top: 0.75rem; }

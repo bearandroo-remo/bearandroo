@@ -43,6 +43,11 @@
               <i class="pi pi-upload"></i> Excel Import
             </a>
           </li>
+          <li *ngIf="isSuperAdmin()">
+            <a routerLink="/tenants" routerLinkActive="active" (click)="menuOpen.set(false)">
+              <i class="pi pi-building"></i> Tenantlar
+            </a>
+          </li>
         </ul>
       </nav>
       <div class="logout">

@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, computed } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
@@ -11,6 +11,17 @@ import { CommonModule } from '@angular/common';
 })
 export class ShellComponent {
   menuOpen = signal(false);
+
+  isSuperAdmin = computed(() => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return false;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1])) as { role: string };
+      return payload.role === 'SUPER_ADMIN';
+    } catch {
+      return false;
+    }
+  });
 
   constructor(private router: Router) {}
 
