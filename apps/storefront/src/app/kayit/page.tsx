@@ -9,7 +9,6 @@ import { useAuth } from '@/context/AuthContext';
 export default function RegisterPage() {
   const { register } = useAuth();
   const router = useRouter();
-  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -39,27 +38,6 @@ export default function RegisterPage() {
       </h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label
-            className="block text-sm font-medium mb-1"
-            style={{ color: 'var(--color-text)' }}
-          >
-            Ad Soyad
-          </label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            className="w-full px-4 py-3 rounded-xl border outline-none transition"
-            style={{
-              borderColor: 'var(--color-secondary)',
-              backgroundColor: 'var(--color-background)',
-              color: 'var(--color-text)',
-            }}
-          />
-        </div>
-
         <div>
           <label
             className="block text-sm font-medium mb-1"
