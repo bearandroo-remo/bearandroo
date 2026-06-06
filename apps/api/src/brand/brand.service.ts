@@ -38,4 +38,12 @@ export class BrandService {
       data: { isActive: false },
     });
   }
+
+  async findBySlug(slug: string, tenantId: string) {
+    const brand = await this.prisma.brand.findUnique({
+      where: { slug_tenantId: { slug, tenantId } },
+    });
+    if (!brand) throw new NotFoundException('Brand not found');
+    return brand;
+  }
 }

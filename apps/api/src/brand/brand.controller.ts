@@ -47,4 +47,12 @@ export class BrandController {
   remove(@Param('id') id: string) {
     return this.brandService.remove(id);
   }
+
+  @Get(':slug')
+  findBySlug(
+    @Param('slug') slug: string,
+    @Req() req: tenantMiddleware.TenantRequest,
+  ) {
+    return this.brandService.findBySlug(slug, req.tenantId!);
+  }
 }
