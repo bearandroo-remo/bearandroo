@@ -10,6 +10,9 @@ async function bootstrap() {
       'http://localhost:4200',
       'https://admin.bearandroo.com.tr',
       'https://cold-sea-5b2a.yunusoncel.workers.dev',
+      'http://localhost:3000',
+      'https://bearandroo.vercel.app',
+      'https://bearandroo.com.tr',
     ],
     credentials: true,
   });
