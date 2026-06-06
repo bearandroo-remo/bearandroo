@@ -58,5 +58,14 @@ export async function getTenantSettings() {
   const text = await res.text();
   if (!text) return null;
   return JSON.parse(text);
+}
 
+export async function getCollectionBySlug(slug: string) {
+  const res = await fetch(`${API_URL}/collections/${slug}`, {
+    headers,
+    next: { revalidate: 60 },
+  });
+  const text = await res.text();
+  if (!text) return null;
+  return JSON.parse(text);
 }

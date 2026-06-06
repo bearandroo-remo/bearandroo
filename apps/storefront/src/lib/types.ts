@@ -52,3 +52,16 @@ export interface Seo {
   twitterImage: string | null;
   schemaOrg: Record<string, unknown> | null;
 }
+
+export interface Collection {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  image: string | null;
+  icon: string | null;
+  isActive: boolean;
+  order: number;
+  products: { product: Product }[];
+  seo?: Seo | null;
+}
