@@ -7,7 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 
 export default function AccountPage() {
-  const { user, logout, isLoading, token } = useAuth();
+  const { user, logout, isLoading, token, refreshUser } = useAuth();
   const router = useRouter();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -44,8 +44,7 @@ export default function AccountPage() {
       },
       body: JSON.stringify({ name, phone }),
     });
-    // name'i local state'de de güncelle
-    setName(name);
+    if (token) await refreshUser(token);
     setSaved(true);
     setSaving(false);
     setTimeout(() => setSaved(false), 2000);
