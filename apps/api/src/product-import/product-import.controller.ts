@@ -6,7 +6,6 @@ import {
   UseInterceptors,
   UploadedFile,
   Req,
-  Res,
   StreamableFile,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -15,7 +14,6 @@ import { JwtAuthGuard } from '../auth/jwt.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import * as tenantMiddleware from '../tenant/tenant.middleware';
-import type { Response } from 'express';
 
 @Controller('product-import')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -29,6 +27,19 @@ export class ProductImportController {
     return new StreamableFile(buffer, {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       disposition: 'attachment; filename="urun-import-template.xlsx"',
+    });
+  }
+
+  @Get('export')
+  async exportProducts(
+    @Req() req: tenantMiddleware.TenantRequest,
+  ): Promise<StreamableFile> {
+    const buffer = await this.productImportService.exportProducts(
+      req.tenantId!,
+    );
+    return new StreamableFile(buffer, {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      disposition: 'attachment; filename="urunler-export.xlsx"',
     });
   }
 

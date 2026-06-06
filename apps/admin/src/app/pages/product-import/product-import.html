@@ -1,7 +1,10 @@
 <div class="page">
   <div class="page-header">
     <h1>Excel ile Ürün İçe Aktar</h1>
-    <p-button label="Template İndir" icon="pi pi-download" severity="secondary" (onClick)="downloadTemplate()" />
+    <div class="flex gap-2">
+      <p-button label="Template İndir" icon="pi pi-file-excel" severity="secondary" (onClick)="downloadTemplate()" />
+      <p-button label="Mevcut Ürünleri İndir" icon="pi pi-download" severity="info" (onClick)="exportProducts()" />
+    </div>
   </div>
 
   <!-- Adım 1: Dosya Yükle -->

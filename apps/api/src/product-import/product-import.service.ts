@@ -82,7 +82,6 @@ export class ProductImportService {
   generateTemplate(): Buffer {
     const wb = XLSX.utils.book_new();
 
-
     // Sheet 1 - Kategoriler
     const categoryData = [
       { name: 'Kadın', parentName: '', slug: 'kadin', order: 1, icon: '👗' },
@@ -192,6 +191,157 @@ export class ProductImportService {
     });
 
     return Buffer.from(buffer);
+  }
+
+  async exportProducts(tenantId: string): Promise<Buffer> {
+    const wb = XLSX.utils.book_new();
+
+    // Kategoriler
+    const categories = await this.prisma.category.findMany({
+      where: { tenantId },
+      include: { parent: true },
+      orderBy: { order: 'asc' },
+    });
+    const categoryData = categories.map((c) => ({
+      name: c.name,
+      parentName: c.parent?.name ?? '',
+      slug: c.slug,
+      order: c.order,
+      icon: c.icon ?? '',
+    }));
+    XLSX.utils.book_append_sheet(
+      wb,
+      XLSX.utils.json_to_sheet(
+        categoryData.length > 0
+          ? categoryData
+          : [{ name: '', parentName: '', slug: '', order: '', icon: '' }],
+      ),
+      'Kategoriler',
+    );
+
+    // Markalar
+    const brands = await this.prisma.brand.findMany({
+      where: { tenantId },
+      orderBy: { name: 'asc' },
+    });
+    const brandData = brands.map((b) => ({
+      name: b.name,
+      slug: b.slug,
+      logo: b.logo ?? '',
+    }));
+    XLSX.utils.book_append_sheet(
+      wb,
+      XLSX.utils.json_to_sheet(
+        brandData.length > 0 ? brandData : [{ name: '', slug: '', logo: '' }],
+      ),
+      'Markalar',
+    );
+
+    // Koleksiyonlar
+    const collections = await this.prisma.collection.findMany({
+      where: { tenantId },
+      orderBy: { order: 'asc' },
+    });
+    const collectionData = collections.map((c) => ({
+      name: c.name,
+      slug: c.slug,
+      description: c.description ?? '',
+      order: c.order,
+    }));
+    XLSX.utils.book_append_sheet(
+      wb,
+      XLSX.utils.json_to_sheet(
+        collectionData.length > 0
+          ? collectionData
+          : [{ name: '', slug: '', description: '', order: '' }],
+      ),
+      'Koleksiyonlar',
+    );
+
+    // Ürünler
+    const products = await this.prisma.product.findMany({
+      where: { tenantId, isActive: true },
+      include: {
+        category: true,
+        brand: true,
+        variants: { where: { isActive: true } },
+        collections: { include: { collection: true } },
+        seo: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    const productRows: Record<string, unknown>[] = [];
+
+    for (const product of products) {
+      const collectionName = product.collections[0]?.collection?.name ?? '';
+      const seo = product.seo;
+
+      if (product.variants.length === 0) {
+        productRows.push({
+          name: product.name,
+          slug: product.slug,
+          description: product.description ?? '',
+          categoryName: product.category?.name ?? '',
+          brandName: product.brand?.name ?? '',
+          collectionName,
+          price: '',
+          stock: '',
+          sku: '',
+          fulfillmentType: product.fulfillmentType,
+          productionDays: product.productionDays ?? '',
+          isActive: product.isActive,
+          metaTitle: seo?.metaTitle ?? '',
+          metaDescription: seo?.metaDescription ?? '',
+        });
+      } else {
+        for (const variant of product.variants) {
+          const attrs = variant.attributes as Record<string, string>;
+          productRows.push({
+            name: product.name,
+            slug: product.slug,
+            description: product.description ?? '',
+            categoryName: product.category?.name ?? '',
+            brandName: product.brand?.name ?? '',
+            collectionName,
+            price: Number(variant.price),
+            stock: variant.stock,
+            sku: variant.sku,
+            fulfillmentType: product.fulfillmentType,
+            productionDays: product.productionDays ?? '',
+            isActive: product.isActive,
+            metaTitle: seo?.metaTitle ?? '',
+            metaDescription: seo?.metaDescription ?? '',
+            ...attrs,
+          });
+        }
+      }
+    }
+
+    XLSX.utils.book_append_sheet(
+      wb,
+      XLSX.utils.json_to_sheet(
+        productRows.length > 0
+          ? productRows
+          : [
+              {
+                name: '',
+                slug: '',
+                description: '',
+                categoryName: '',
+                brandName: '',
+                collectionName: '',
+                price: '',
+                stock: '',
+                sku: '',
+              },
+            ],
+      ),
+      'Ürünler',
+    );
+
+    const raw = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    return Buffer.from(raw);
   }
 
   // ── Parse ─────────────────────────────────────────────────────────────────

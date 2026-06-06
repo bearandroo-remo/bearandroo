@@ -99,6 +99,26 @@ export class ProductImportComponent {
     this.importing.set(false);
   }
 
+  exportProducts() {
+    const token = localStorage.getItem('accessToken');
+    const apiKey = this.getApiKey();
+    void fetch(`${environment.apiUrl}/product-import/export`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'x-api-key': apiKey,
+      },
+    })
+      .then((res) => res.blob())
+      .then((blob) => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'urunler-export.xlsx');
+        link.click();
+        URL.revokeObjectURL(url);
+      });
+  }
+
   private getApiKey(): string {
     const token = localStorage.getItem('accessToken');
     if (!token) return '';
