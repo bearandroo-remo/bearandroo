@@ -18,6 +18,7 @@ import { TenantSettingsModule } from './tenant-settings/tenant-settings.module';
 import { AddressModule } from './address/address.module';
 import { OrderModule } from './order/order.module';
 import { ProductImportModule } from './product-import/product-import.module';
+import { SuperAdminModule } from './super-admin/super-admin.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { ProductImportModule } from './product-import/product-import.module';
     AddressModule,
     OrderModule,
     ProductImportModule,
+    SuperAdminModule,
   ],
   controllers: [ApiController],
   providers: [ApiService, PrismaService],
