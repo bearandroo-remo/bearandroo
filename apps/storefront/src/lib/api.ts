@@ -70,6 +70,7 @@ export async function getBrandBySlug(slug: string) {
   const text = await res.text();
   if (!text) return null;
   return JSON.parse(text);
+
 }
 
 export async function getProducts(
