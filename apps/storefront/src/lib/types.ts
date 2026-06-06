@@ -35,6 +35,7 @@ export interface Product {
   isActive: boolean;
   variants: Variant[];
   images: ProductImage[];
+  details: ProductDetail[];
 }
 
 export interface Seo {
@@ -64,4 +65,13 @@ export interface Collection {
   order: number;
   products: { product: Product }[];
   seo?: Seo | null;
+}
+
+export interface ProductDetail {
+  id: string;
+  group: string | null;
+  type: 'KEY_VALUE' | 'RICH_TEXT';
+  key: string | null;
+  value: string | null;
+  order: number;
 }

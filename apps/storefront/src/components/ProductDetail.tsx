@@ -2,7 +2,12 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import type { Product, Variant, ProductImage } from '@/lib/types';
+import type {
+  Product,
+  Variant,
+  ProductImage,
+  ProductDetail,
+} from '@/lib/types';
 import { useCart } from '@/context/CartContext';
 
 interface Props {
@@ -67,172 +72,240 @@ export default function ProductDetail({ product }: Props) {
     setTimeout(() => setAdded(false), 2000);
   };
 
+  const groups = Array.from(
+    new Set(product.details?.map((d) => d.group) ?? []),
+  );
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-      {/* Resimler */}
-      <div>
-        <div className="aspect-square bg-gray-100 rounded-2xl overflow-hidden mb-4">
-          {currentImage ? (
-            <Image
-              src={currentImage.url}
-              alt={product.name}
-              width={600}
-              height={600}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-gray-400">
-              Resim yok
-            </div>
-          )}
-        </div>
-        <div className="grid grid-cols-4 gap-2">
-          {displayImages.map((image: ProductImage, index: number) => (
-            <button
-              key={image.id}
-              onClick={() => setSelectedImageIndex(index)}
-              className={`aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 transition ${
-                index === selectedImageIndex
-                  ? 'border-[var(--color-primary)]'
-                  : 'border-transparent'
-              }`}
-            >
+    <>
+      {/* Ürün Ana Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+        {/* Resimler */}
+        <div>
+          <div className="aspect-square bg-gray-100 rounded-2xl overflow-hidden mb-4">
+            {currentImage ? (
               <Image
-                src={image.thumbUrl ?? image.url}
+                src={currentImage.url}
                 alt={product.name}
-                width={150}
-                height={150}
+                width={600}
+                height={600}
                 className="w-full h-full object-cover"
               />
-            </button>
-          ))}
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-gray-400">
+                Resim yok
+              </div>
+            )}
+          </div>
+          <div className="grid grid-cols-4 gap-2">
+            {displayImages.map((image: ProductImage, index: number) => (
+              <button
+                key={image.id}
+                onClick={() => setSelectedImageIndex(index)}
+                className={`aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 transition ${
+                  index === selectedImageIndex
+                    ? 'border-[var(--color-primary)]'
+                    : 'border-transparent'
+                }`}
+              >
+                <Image
+                  src={image.thumbUrl ?? image.url}
+                  alt={product.name}
+                  width={150}
+                  height={150}
+                  className="w-full h-full object-cover"
+                />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Ürün Bilgileri */}
+        <div>
+          {product.category && (
+            <p
+              className="text-sm mb-2"
+              style={{ color: 'var(--color-accent)' }}
+            >
+              {product.category.name}
+            </p>
+          )}
+          <h1
+            className="text-3xl font-bold mb-4"
+            style={{ color: 'var(--color-text)' }}
+          >
+            {product.name}
+          </h1>
+
+          {price !== null && (
+            <p
+              className="text-2xl font-semibold mb-6"
+              style={{ color: 'var(--color-primary)' }}
+            >
+              {price.toFixed(2)} ₺
+            </p>
+          )}
+
+          {product.description && (
+            <p
+              className="mb-8"
+              style={{ color: 'var(--color-text)', opacity: 0.7 }}
+            >
+              {product.description}
+            </p>
+          )}
+
+          {attributeKeys.map((key) => {
+            const values = Array.from(
+              new Set(
+                product.variants.map((v) => v.attributes[key]).filter(Boolean),
+              ),
+            );
+
+            return (
+              <div key={key} className="mb-6">
+                <h3
+                  className="font-semibold mb-3 capitalize"
+                  style={{ color: 'var(--color-text)' }}
+                >
+                  {key}:{' '}
+                  <span
+                    className="font-normal"
+                    style={{ color: 'var(--color-text)', opacity: 0.6 }}
+                  >
+                    {selectedVariant?.attributes[key] ?? ''}
+                  </span>
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {values.map((value) => {
+                    const isSelected =
+                      selectedVariant?.attributes[key] === value;
+                    const isAvailable = product.variants.some(
+                      (v) => v.attributes[key] === value && v.stock > 0,
+                    );
+
+                    return (
+                      <button
+                        key={value}
+                        onClick={() => handleAttributeSelect(key, value)}
+                        disabled={!isAvailable}
+                        style={
+                          isSelected
+                            ? {
+                                backgroundColor: 'var(--color-primary)',
+                                borderColor: 'var(--color-primary)',
+                                color: '#fff',
+                              }
+                            : {}
+                        }
+                        className={`border rounded-lg px-4 py-2 text-sm transition ${
+                          isSelected
+                            ? ''
+                            : isAvailable
+                              ? 'border-gray-300 hover:border-[var(--color-primary)]'
+                              : 'border-gray-200 text-gray-400 cursor-not-allowed line-through'
+                        }`}
+                      >
+                        {value}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+
+          {selectedVariant && (
+            <p
+              className={`text-sm mb-4 ${inStock ? 'text-green-600' : 'text-red-500'}`}
+            >
+              {inStock
+                ? `Stokta var (${selectedVariant.stock} adet)`
+                : 'Stokta yok'}
+            </p>
+          )}
+
+          <button
+            disabled={!inStock || added}
+            onClick={handleAddToCart}
+            style={
+              added
+                ? {}
+                : inStock
+                  ? { backgroundColor: 'var(--color-primary)' }
+                  : {}
+            }
+            className={`w-full py-4 rounded-xl font-semibold transition ${
+              added
+                ? 'bg-green-600 text-white'
+                : inStock
+                  ? 'text-white hover:opacity-90'
+                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+            }`}
+          >
+            {added
+              ? '✓ Sepete Eklendi'
+              : inStock
+                ? 'Sepete Ekle'
+                : 'Stokta Yok'}
+          </button>
         </div>
       </div>
 
-      {/* Ürün Bilgileri */}
-      <div>
-        {product.category && (
-          <p className="text-sm mb-2" style={{ color: 'var(--color-accent)' }}>
-            {product.category.name}
-          </p>
-        )}
-        <h1
-          className="text-3xl font-bold mb-4"
-          style={{ color: 'var(--color-text)' }}
-        >
-          {product.name}
-        </h1>
-
-        {price !== null && (
-          <p
-            className="text-2xl font-semibold mb-6"
-            style={{ color: 'var(--color-primary)' }}
-          >
-            {price.toFixed(2)} ₺
-          </p>
-        )}
-
-        {product.description && (
-          <p
-            className="mb-8"
-            style={{ color: 'var(--color-text)', opacity: 0.7 }}
-          >
-            {product.description}
-          </p>
-        )}
-
-        {attributeKeys.map((key) => {
-          const values = Array.from(
-            new Set(
-              product.variants.map((v) => v.attributes[key]).filter(Boolean),
-            ),
-          );
-
-          return (
-            <div key={key} className="mb-6">
-              <h3
-                className="font-semibold mb-3 capitalize"
-                style={{ color: 'var(--color-text)' }}
-              >
-                {key}:{' '}
-                <span
-                  className="font-normal"
-                  style={{ color: 'var(--color-text)', opacity: 0.6 }}
-                >
-                  {selectedVariant?.attributes[key] ?? ''}
-                </span>
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {values.map((value) => {
-                  const isSelected = selectedVariant?.attributes[key] === value;
-                  const isAvailable = product.variants.some(
-                    (v) => v.attributes[key] === value && v.stock > 0,
-                  );
-
-                  return (
-                    <button
-                      key={value}
-                      onClick={() => handleAttributeSelect(key, value)}
-                      disabled={!isAvailable}
-                      style={
-                        isSelected
-                          ? {
-                              backgroundColor: 'var(--color-primary)',
-                              borderColor: 'var(--color-primary)',
-                              color: '#fff',
-                            }
-                          : isAvailable
-                            ? {}
-                            : {}
-                      }
-                      className={`border rounded-lg px-4 py-2 text-sm transition ${
-                        isSelected
-                          ? ''
-                          : isAvailable
-                            ? 'border-gray-300 hover:border-[var(--color-primary)]'
-                            : 'border-gray-200 text-gray-400 cursor-not-allowed line-through'
-                      }`}
-                    >
-                      {value}
-                    </button>
-                  );
-                })}
+      {/* Ürün Detayları - Grid Dışında */}
+      {product.details && product.details.length > 0 && (
+        <div className="mt-12">
+          {groups.map((group) => {
+            const groupDetails = product.details.filter(
+              (d) => d.group === group,
+            );
+            return (
+              <div key={group} className="mb-8">
+                {group && (
+                  <h3
+                    className="font-semibold text-lg mb-4 pb-2 border-b"
+                    style={{
+                      color: 'var(--color-text)',
+                      borderColor: 'var(--color-secondary)',
+                    }}
+                  >
+                    {group}
+                  </h3>
+                )}
+                {groupDetails.map((detail: ProductDetail) => (
+                  <div key={detail.id}>
+                    {detail.type === 'KEY_VALUE' ? (
+                      <div
+                        className="flex gap-4 py-2 border-b"
+                        style={{ borderColor: 'var(--color-secondary)' }}
+                      >
+                        <span
+                          className="font-medium w-40 flex-shrink-0 text-sm"
+                          style={{ color: 'var(--color-text)' }}
+                        >
+                          {detail.key}
+                        </span>
+                        <span
+                          className="text-sm opacity-70"
+                          style={{ color: 'var(--color-text)' }}
+                        >
+                          {detail.value}
+                        </span>
+                      </div>
+                    ) : (
+                      <div
+                        className="prose prose-sm max-w-none mt-2"
+                        style={{ color: 'var(--color-text)' }}
+                        dangerouslySetInnerHTML={{ __html: detail.value ?? '' }}
+                      />
+                    )}
+                  </div>
+                ))}
               </div>
-            </div>
-          );
-        })}
-
-        {selectedVariant && (
-          <p
-            className={`text-sm mb-4 ${inStock ? 'text-green-600' : 'text-red-500'}`}
-          >
-            {inStock
-              ? `Stokta var (${selectedVariant.stock} adet)`
-              : 'Stokta yok'}
-          </p>
-        )}
-
-        <button
-          disabled={!inStock || added}
-          onClick={handleAddToCart}
-          style={
-            added
-              ? {}
-              : inStock
-                ? { backgroundColor: 'var(--color-primary)' }
-                : {}
-          }
-          className={`w-full py-4 rounded-xl font-semibold transition ${
-            added
-              ? 'bg-green-600 text-white'
-              : inStock
-                ? 'text-white hover:opacity-90'
-                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-          }`}
-        >
-          {added ? '✓ Sepete Eklendi' : inStock ? 'Sepete Ekle' : 'Stokta Yok'}
-        </button>
-      </div>
-    </div>
+            );
+          })}
+        </div>
+      )}
+    </>
   );
 }
