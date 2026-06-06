@@ -58,6 +58,7 @@ export class ProductController {
   ) {
     const reservedKeys = [
       'categoryId',
+      'categoryIds',
       'brandId',
       'collectionId',
       'minPrice',

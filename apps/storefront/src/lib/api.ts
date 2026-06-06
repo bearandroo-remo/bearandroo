@@ -17,9 +17,10 @@ export async function getProductBySlug(slug: string) {
 export async function getCategories() {
   const res = await fetch(`${API_URL}/categories`, {
     headers,
-    next: { revalidate: 60 },
+    cache: 'no-store',
   });
-  return res.json();
+  const data = await res.json();
+  return Array.isArray(data) ? data : [];
 }
 
 export async function getSeoByProduct(productId: string) {
@@ -105,6 +106,9 @@ export async function getProducts(
     ? `${API_URL}/products?${params.toString()}`
     : `${API_URL}/products`;
 
-  const res = await fetch(url, { headers, next: { revalidate: 0 } });
+  const res = await fetch(url, {
+    headers,
+    cache: 'no-store',
+  });
   return res.json();
 }

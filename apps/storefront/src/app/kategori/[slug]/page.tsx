@@ -64,7 +64,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
 
   // Filtre parametrelerini al
   const { minPrice, maxPrice, inStock, sortBy, ...attributeParams } = sp;
-  const reservedKeys = ['minPrice', 'maxPrice', 'inStock', 'sortBy'];
+  const reservedKeys = ['minPrice', 'maxPrice', 'inStock', 'sortBy','slug'];
   const attributes: Record<string, string> = {};
   Object.entries(attributeParams).forEach(([k, v]) => {
     if (!reservedKeys.includes(k)) attributes[k] = v;
