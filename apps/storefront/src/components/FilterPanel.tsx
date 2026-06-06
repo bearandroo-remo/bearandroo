@@ -86,7 +86,10 @@ export default function FilterPanel({
     setPriceRange({ min: '', max: '' });
     setInStock(false);
     setSortBy('');
-    router.push('?');
+    const params = new URLSearchParams();
+    const q = searchParams.get('q');
+    if (q) params.set('q', q);
+    router.push(params.toString() ? `?${params.toString()}` : '?');
   };
 
   if (!filters) return null;

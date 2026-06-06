@@ -5,9 +5,11 @@ import Image from 'next/image';
 import { getBrandBySlug, getProducts } from '@/lib/api';
 import type { Product, ProductImage } from '@/lib/types';
 import type { Metadata } from 'next';
+import FilterPanel from '@/components/FilterPanel';
 
 interface Props {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<Record<string, string>>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -21,8 +23,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function BrandPage({ params }: Props) {
+export default async function BrandPage({ params, searchParams }: Props) {
   const { slug } = await params;
+  const sp = await searchParams;
   const brand = await getBrandBySlug(slug);
 
   if (!brand) {
@@ -33,7 +36,25 @@ export default async function BrandPage({ params }: Props) {
     );
   }
 
-  const products = (await getProducts(undefined, brand.id)) as Product[];
+  const { minPrice, maxPrice, inStock, sortBy, ...attributeParams } = sp;
+  const reservedKeys = ['minPrice', 'maxPrice', 'inStock', 'sortBy', 'slug'];
+  const attributes: Record<string, string> = {};
+  Object.entries(attributeParams).forEach(([k, v]) => {
+    if (!reservedKeys.includes(k)) attributes[k] = v;
+  });
+
+  const products = (await getProducts(
+    undefined,
+    brand.id,
+    undefined,
+    undefined,
+    Object.keys(attributes).length > 0 ? attributes : undefined,
+    minPrice ? parseFloat(minPrice) : undefined,
+    maxPrice ? parseFloat(maxPrice) : undefined,
+    inStock === 'true',
+    undefined,
+    sortBy,
+  )) as Product[];
 
   return (
     <main
@@ -62,63 +83,87 @@ export default async function BrandPage({ params }: Props) {
         </div>
       </div>
 
-      {/* Ürünler */}
-      {products.length === 0 ? (
-        <p className="opacity-60">Bu markaya ait henüz ürün yok.</p>
-      ) : (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {products.map((product: Product) => {
-            const mainImage =
-              product.images.find((i: ProductImage) => i.isMain) ??
-              product.images[0];
-            const minPrice =
-              product.variants.length > 0
-                ? Math.min(...product.variants.map((v) => parseFloat(v.price)))
-                : null;
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        {/* Sol Filtre Panel */}
+        <aside
+          className="rounded-xl p-4 h-fit"
+          style={{ backgroundColor: 'var(--color-secondary)' }}
+        >
+          <FilterPanel brandId={brand.id} />
+        </aside>
 
-            return (
-              <Link
-                key={product.id}
-                href={`/urun/${product.slug}`}
-                className="group"
-              >
-                <div
-                  className="aspect-square rounded-xl overflow-hidden mb-3"
-                  style={{ backgroundColor: 'var(--color-secondary)' }}
-                >
-                  {mainImage ? (
-                    <Image
-                      src={mainImage.thumbUrl ?? mainImage.url}
-                      alt={product.name}
-                      width={400}
-                      height={400}
-                      className="w-full h-full object-cover group-hover:scale-105 transition"
-                    />
-                  ) : (
+        {/* Ürün Grid */}
+        <div className="md:col-span-3">
+          <p
+            className="text-sm opacity-60 mb-4"
+            style={{ color: 'var(--color-text)' }}
+          >
+            {products.length} ürün
+          </p>
+
+          {products.length === 0 ? (
+            <p className="opacity-60">Bu markaya ait henüz ürün yok.</p>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+              {products.map((product: Product) => {
+                const mainImage =
+                  product.images.find((i: ProductImage) => i.isMain) ??
+                  product.images[0];
+                const minPrice =
+                  product.variants.length > 0
+                    ? Math.min(
+                        ...product.variants.map((v) => parseFloat(v.price)),
+                      )
+                    : null;
+
+                return (
+                  <Link
+                    key={product.id}
+                    href={`/urun/${product.slug}`}
+                    className="group"
+                  >
                     <div
-                      className="w-full h-full flex items-center justify-center"
-                      style={{ color: 'var(--color-accent)' }}
+                      className="aspect-square rounded-xl overflow-hidden mb-3"
+                      style={{ backgroundColor: 'var(--color-secondary)' }}
                     >
-                      Resim yok
+                      {mainImage ? (
+                        <Image
+                          src={mainImage.thumbUrl ?? mainImage.url}
+                          alt={product.name}
+                          width={400}
+                          height={400}
+                          className="w-full h-full object-cover group-hover:scale-105 transition"
+                        />
+                      ) : (
+                        <div
+                          className="w-full h-full flex items-center justify-center"
+                          style={{ color: 'var(--color-accent)' }}
+                        >
+                          Resim yok
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-                <h3
-                  className="font-medium"
-                  style={{ color: 'var(--color-text)' }}
-                >
-                  {product.name}
-                </h3>
-                {minPrice && (
-                  <p className="mt-1" style={{ color: 'var(--color-primary)' }}>
-                    {minPrice.toFixed(2)} ₺
-                  </p>
-                )}
-              </Link>
-            );
-          })}
+                    <h3
+                      className="font-medium"
+                      style={{ color: 'var(--color-text)' }}
+                    >
+                      {product.name}
+                    </h3>
+                    {minPrice && (
+                      <p
+                        className="mt-1"
+                        style={{ color: 'var(--color-primary)' }}
+                      >
+                        {minPrice.toFixed(2)} ₺
+                      </p>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </main>
   );
 }
