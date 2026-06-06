@@ -24,6 +24,7 @@ export class ProductService {
   async findAll(
     tenantId: string,
     categoryId?: string,
+    categoryIds?: string[],
     brandId?: string,
     collectionId?: string,
     attributes?: Record<string, string>,
@@ -45,7 +46,11 @@ export class ProductService {
     }
 
     const where: Record<string, unknown> = { isActive: true, tenantId };
-    if (categoryId) where['categoryId'] = categoryId;
+    if (categoryIds && categoryIds.length > 0) {
+      where['categoryId'] = { in: categoryIds };
+    } else if (categoryId) {
+      where['categoryId'] = categoryId;
+    }
     if (brandId) where['brandId'] = brandId;
     if (productIds) where['id'] = { in: productIds };
     if (fulfillmentType) where['fulfillmentType'] = fulfillmentType;
@@ -164,6 +169,7 @@ export class ProductService {
   async getFilters(
     tenantId: string,
     categoryId?: string,
+    categoryIds?: string[],
     brandId?: string,
     collectionId?: string,
   ) {
@@ -178,7 +184,13 @@ export class ProductService {
     }
 
     const where: Record<string, unknown> = { isActive: true, tenantId };
-    if (categoryId) where['categoryId'] = categoryId;
+
+    if (categoryIds && categoryIds.length > 0) {
+      where['categoryId'] = { in: categoryIds };
+    } else if (categoryId) {
+      where['categoryId'] = categoryId;
+    }
+
     if (brandId) where['brandId'] = brandId;
     if (productIds) where['id'] = { in: productIds };
 

@@ -72,12 +72,38 @@ export async function getBrandBySlug(slug: string) {
   return JSON.parse(text);
 }
 
-export async function getProducts(categoryId?: string, brandId?: string) {
-  let url = `${API_URL}/products`;
+export async function getProducts(
+  categoryId?: string,
+  brandId?: string,
+  collectionId?: string,
+  search?: string,
+  attributes?: Record<string, string>,
+  minPrice?: number,
+  maxPrice?: number,
+  inStock?: boolean,
+  fulfillmentType?: string,
+  sortBy?: string,
+  categoryIds?: string,
+) {
   const params = new URLSearchParams();
   if (categoryId) params.append('categoryId', categoryId);
+  if (categoryIds) params.append('categoryIds', categoryIds);
   if (brandId) params.append('brandId', brandId);
-  if (params.toString()) url += `?${params.toString()}`;
-  const res = await fetch(url, { headers, next: { revalidate: 60 } });
+  if (collectionId) params.append('collectionId', collectionId);
+  if (search) params.append('q', search);
+  if (minPrice) params.append('minPrice', String(minPrice));
+  if (maxPrice) params.append('maxPrice', String(maxPrice));
+  if (inStock) params.append('inStock', 'true');
+  if (fulfillmentType) params.append('fulfillmentType', fulfillmentType);
+  if (sortBy) params.append('sortBy', sortBy);
+  if (attributes) {
+    Object.entries(attributes).forEach(([k, v]) => params.append(k, v));
+  }
+
+  const url = params.toString()
+    ? `${API_URL}/products?${params.toString()}`
+    : `${API_URL}/products`;
+
+  const res = await fetch(url, { headers, next: { revalidate: 0 } });
   return res.json();
 }

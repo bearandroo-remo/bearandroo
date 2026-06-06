@@ -28,12 +28,14 @@ export class ProductController {
   getFilters(
     @Req() req: tenantMiddleware.TenantRequest,
     @Query('categoryId') categoryId?: string,
+    @Query('categoryIds') categoryIds?: string,
     @Query('brandId') brandId?: string,
     @Query('collectionId') collectionId?: string,
   ) {
     return this.productService.getFilters(
       req.tenantId!,
       categoryId,
+      categoryIds ? categoryIds.split(',') : undefined,
       brandId,
       collectionId,
     );
@@ -43,6 +45,7 @@ export class ProductController {
   findAll(
     @Req() req: tenantMiddleware.TenantRequest,
     @Query('categoryId') categoryId?: string,
+    @Query('categoryIds') categoryIds?: string,
     @Query('brandId') brandId?: string,
     @Query('collectionId') collectionId?: string,
     @Query('minPrice') minPrice?: string,
@@ -74,6 +77,7 @@ export class ProductController {
     return this.productService.findAll(
       req.tenantId!,
       categoryId,
+      categoryIds ? categoryIds.split(',') : undefined,
       brandId,
       collectionId,
       Object.keys(attributes).length > 0 ? attributes : undefined,

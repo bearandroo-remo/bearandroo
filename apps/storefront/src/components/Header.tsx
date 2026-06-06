@@ -5,6 +5,7 @@ import CartIcon from '@/components/CartIcon';
 import NavMenu from '@/components/NavMenu';
 import MobileMenu from '@/components/MobileMenu';
 import UserIcon from '@/components/UserIcon';
+import SearchBar from '@/components/SearchBar';
 
 export default async function Header() {
   const [categories, settings] = await Promise.all([
@@ -29,7 +30,7 @@ export default async function Header() {
           >
             Bearandroo
           </Link>
-
+          <SearchBar />
           <NavMenu
             categories={categories}
             headerLinks={(settings?.headerLinks as never) ?? null}
