@@ -2,6 +2,18 @@
   <header class="topbar">
     <p-button icon="pi pi-bars" severity="secondary" [text]="true" (onClick)="toggleMenu()" />
     <h3>Bearandroo Admin</h3>
+
+    <!-- Super Admin tenant seçici -->
+    <div *ngIf="isSuperAdmin()" class="tenant-selector">
+      <p-select
+        [options]="tenants()"
+        optionLabel="name"
+        (onChange)="selectTenant($event.value)"
+        placeholder="Tenant Seç"
+        appendTo="body"
+        [style]="{minWidth: '150px'}"
+      />
+    </div>
   </header>
 
   <div class="body">

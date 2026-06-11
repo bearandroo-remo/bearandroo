@@ -11,6 +11,9 @@ export class HttpService {
   }
 
   private get apiKey(): string {
+    const selectedApiKey = localStorage.getItem('selectedTenantApiKey');
+    if (selectedApiKey) return selectedApiKey;
+
     const token = localStorage.getItem('accessToken');
     if (!token) return '';
     try {
